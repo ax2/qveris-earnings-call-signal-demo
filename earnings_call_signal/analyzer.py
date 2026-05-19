@@ -458,7 +458,11 @@ class EarningsCallSignalAnalyzer:
         if include_market_context:
             from .market import fetch_market_context
 
-            market_context = await fetch_market_context([period.__dict__ for period in selected_periods])
+            market_context = await fetch_market_context(
+                [period.__dict__ for period in selected_periods],
+                client=self.client,
+                session_id=self.session_id,
+            )
         return {
             "demo": "qveris-earnings-call-signal-demo",
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -962,6 +966,11 @@ def _write_market_context(report: dict[str, Any], path: Path) -> None:
         "event_date",
         "status",
         "error",
+        "price_source",
+        "market_tool_id",
+        "execution_id",
+        "success",
+        "cost",
         "base_trading_date",
         "base_close",
         "next_trading_date",

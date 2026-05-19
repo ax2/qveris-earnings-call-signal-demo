@@ -1,6 +1,6 @@
 # Earnings Call Signal Report: AAPL, NVDA
 
-Generated at `2026-05-19T10:31:59Z` with QVeris search + execute. Elapsed: `5.009s`.
+Generated at `2026-05-19T10:41:21Z` with QVeris search + execute. Elapsed: `7.395s`.
 
 ## Research Brief
 
@@ -64,12 +64,10 @@ Generated at `2026-05-19T10:31:59Z` with QVeris search + execute. Elapsed: `5.00
 
 | Symbol | Event date | Status | Base close | Next close | Next return | 5-day return |
 |---|---|---|---:|---:|---:|---:|
-| NVDA | 2026-02-25 | unavailable | None | None | None% | None% |
-| NVDA | 2025-11-19 | unavailable | None | None | None% | None% |
-| AAPL | 2026-04-30 | unavailable | None | None | None% | None% |
-| AAPL | 2026-01-29 | unavailable | None | None | None% | None% |
-
-Some market context rows are unavailable; check `market_context.csv` for status and error details.
+| NVDA | 2026-02-25 | ok | 195.56 | 184.89 | -5.456% | -6.402% |
+| NVDA | 2025-11-19 | ok | 186.52 | 180.64 | -3.152% | -3.356% |
+| AAPL | 2026-04-30 | ok | 271.35 | 280.14 | 3.239% | 5.93% |
+| AAPL | 2026-01-29 | ok | 258.28 | 259.48 | 0.465% | 6.826% |
 
 ## LLM Review Pack
 

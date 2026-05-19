@@ -28,7 +28,7 @@ def run(
     quarters: int = typer.Option(2, min=1, max=8, help="Recent quarters per symbol."),
     theme_set: str = typer.Option("extended", help="Theme preset: core or extended."),
     themes: str | None = typer.Option(None, help="Optional theme subset, e.g. AI,Margin,Guidance."),
-    market_context: bool = typer.Option(False, help="Fetch Yahoo Finance post-call price context."),
+    market_context: bool = typer.Option(False, help="Fetch post-call price context through QVeris."),
     output_dir: Path = typer.Option(Path("outputs"), help="Directory for JSON, Markdown, and CSV outputs."),
     markdown: bool = typer.Option(False, help="Print Markdown instead of JSON summary."),
     write_files: bool = typer.Option(True, help="Write report files to output_dir."),

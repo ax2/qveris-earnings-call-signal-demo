@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import datetime as dt
-import time
+import json
 from dataclasses import dataclass
 from typing import Any
 
-import httpx
+from .client import QverisClient
+
+MARKET_DISCOVER_QUERY = "Financial Modeling Prep historical price EOD light symbol close"
+MARKET_TOOL_ID = "financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211"
+MARKET_SYMBOL_TIMEOUT_S = 25.0
 
 
 @dataclass(frozen=True)
@@ -22,16 +26,13 @@ def _parse_date(value: str) -> dt.date | None:
         return None
 
 
-def _timestamp(date: dt.date) -> int:
-    return int(time.mktime(dt.datetime.combine(date, dt.time.min).timetuple()))
-
-
-async def fetch_market_context(periods: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Fetch lightweight post-call price reactions from Yahoo Finance chart data.
-
-    This is intentionally optional. The transcript workflow still runs even if
-    the market data endpoint is unavailable.
-    """
+async def fetch_market_context(
+    periods: list[dict[str, Any]],
+    *,
+    client: QverisClient,
+    session_id: str,
+) -> list[dict[str, Any]]:
+    """Fetch post-call price context through QVeris-discovered market-data tools."""
 
     by_symbol: dict[str, list[dt.date]] = {}
     for period in periods:
@@ -40,61 +41,100 @@ async def fetch_market_context(periods: list[dict[str, Any]]) -> list[dict[str, 
         if symbol and event_date:
             by_symbol.setdefault(symbol, []).append(event_date)
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        rows = await asyncio.gather(
-            *[_fetch_symbol_context_safe(client, symbol, dates) for symbol, dates in by_symbol.items()]
-        )
+    if not by_symbol:
+        return []
 
+    search_payload = await client.search(MARKET_DISCOVER_QUERY, limit=8, session_id=session_id)
+    search_id = search_payload.get("search_id")
+    if not search_id:
+        return [
+            _unavailable_row(symbol, event_date, "QVeris market tool search did not return search_id.")
+            for symbol, dates in by_symbol.items()
+            for event_date in dates
+        ]
+
+    tasks = [
+        _fetch_symbol_context_safe(client, symbol, dates, search_id=search_id, session_id=session_id)
+        for symbol, dates in by_symbol.items()
+    ]
+    rows = await asyncio.gather(*tasks)
     out = [row for group in rows for row in group]
     return sorted(out, key=lambda row: (row["symbol"], row["event_date"]), reverse=True)
 
 
 async def _fetch_symbol_context_safe(
-    client: httpx.AsyncClient,
+    client: QverisClient,
     symbol: str,
     event_dates: list[dt.date],
+    *,
+    search_id: str,
+    session_id: str,
 ) -> list[dict[str, Any]]:
     try:
-        return await _fetch_symbol_context(client, symbol, event_dates)
+        return await asyncio.wait_for(
+            _fetch_symbol_context(
+                client,
+                symbol,
+                event_dates,
+                search_id=search_id,
+                session_id=session_id,
+            ),
+            timeout=MARKET_SYMBOL_TIMEOUT_S,
+        )
     except Exception as exc:
         return [_unavailable_row(symbol, event_date, f"{type(exc).__name__}: {exc}") for event_date in event_dates]
 
 
 async def _fetch_symbol_context(
-    client: httpx.AsyncClient,
+    client: QverisClient,
     symbol: str,
     event_dates: list[dt.date],
+    *,
+    search_id: str,
+    session_id: str,
 ) -> list[dict[str, Any]]:
-    start = min(event_dates) - dt.timedelta(days=12)
-    end = max(event_dates) + dt.timedelta(days=14)
-    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
-    response = await client.get(
-        url,
-        params={
-            "period1": _timestamp(start),
-            "period2": _timestamp(end),
-            "interval": "1d",
-            "events": "history",
-        },
+    execution = await client.execute(
+        MARKET_TOOL_ID,
+        search_id=search_id,
+        parameters={"symbol": symbol},
+        session_id=session_id,
+        max_response_size=120000,
     )
-    response.raise_for_status()
-    closes = _extract_closes(response.json())
-    return [_reaction_row(symbol, event_date, closes) for event_date in event_dates]
+    closes = _extract_closes(_result_data(execution))
+    rows = [_reaction_row(symbol, event_date, closes) for event_date in event_dates]
+    meta = _compact_execute_meta(execution)
+    return [{**row, **meta} for row in rows]
 
 
-def _extract_closes(payload: dict[str, Any]) -> list[DailyClose]:
-    result = ((payload.get("chart") or {}).get("result") or [None])[0]
+def _result_data(execution: dict[str, Any]) -> Any:
+    result = execution.get("result")
     if not isinstance(result, dict):
-        return []
-    timestamps = result.get("timestamp") or []
-    quote = (((result.get("indicators") or {}).get("quote") or [None])[0]) or {}
-    close_values = quote.get("close") or []
+        return None
+    data = result.get("data")
+    if data is None:
+        data = result.get("truncated_content")
+    for _ in range(2):
+        if isinstance(data, str) and data.strip():
+            try:
+                data = json.loads(data)
+            except json.JSONDecodeError:
+                break
+    return data
+
+
+def _extract_closes(data: Any) -> list[DailyClose]:
     rows: list[DailyClose] = []
-    for ts, close in zip(timestamps, close_values, strict=False):
-        if close is None:
+    for item in data if isinstance(data, list) else []:
+        if not isinstance(item, dict):
             continue
-        date = dt.datetime.fromtimestamp(int(ts), tz=dt.UTC).date()
-        rows.append(DailyClose(date=date, close=round(float(close), 4)))
+        date = _parse_date(str(item.get("date") or ""))
+        close = item.get("close", item.get("price"))
+        if date is None or close is None:
+            continue
+        try:
+            rows.append(DailyClose(date=date, close=round(float(close), 4)))
+        except (TypeError, ValueError):
+            continue
     return rows
 
 
@@ -105,11 +145,14 @@ def _reaction_row(symbol: str, event_date: dt.date, closes: list[DailyClose]) ->
     base = previous[-1] if previous else None
     next_day = after[0] if after else None
     fifth_day = after[4] if len(after) >= 5 else (after[-1] if after else None)
+    status = "ok" if base and next_day else "no_price_data"
     return {
         "symbol": symbol,
         "event_date": event_date.isoformat(),
-        "status": "ok" if base and next_day else "no_price_data",
-        "error": None if base and next_day else "No daily close data found around event date.",
+        "status": status,
+        "error": None if status == "ok" else "No QVeris market-data row found around event date.",
+        "price_source": "QVeris",
+        "market_tool_id": MARKET_TOOL_ID,
         "base_trading_date": base.date.isoformat() if base else None,
         "base_close": base.close if base else None,
         "next_trading_date": next_day.date.isoformat() if next_day else None,
@@ -122,12 +165,16 @@ def _reaction_row(symbol: str, event_date: dt.date, closes: list[DailyClose]) ->
 
 
 def _unavailable_row(symbol: str, event_date: dt.date, error: str) -> dict[str, Any]:
-    clean_error = " ".join(error.split())
     return {
         "symbol": symbol,
         "event_date": event_date.isoformat(),
         "status": "unavailable",
-        "error": clean_error,
+        "error": " ".join(error.split()),
+        "price_source": "QVeris",
+        "market_tool_id": MARKET_TOOL_ID,
+        "execution_id": None,
+        "success": None,
+        "cost": None,
         "base_trading_date": None,
         "base_close": None,
         "next_trading_date": None,
@@ -136,6 +183,14 @@ def _unavailable_row(symbol: str, event_date: dt.date, error: str) -> dict[str, 
         "fifth_trading_date": None,
         "fifth_close": None,
         "fifth_return_pct": None,
+    }
+
+
+def _compact_execute_meta(execution: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "execution_id": execution.get("execution_id"),
+        "success": execution.get("success"),
+        "cost": execution.get("cost"),
     }
 
 

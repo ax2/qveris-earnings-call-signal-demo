@@ -69,7 +69,7 @@ curl --noproxy '*' -s http://127.0.0.1:8092/run \
 - Theme momentum compares the latest quarter with the previous quarter per company.
 - The extended theme set adds supply chain, pricing, and competition signals.
 - Evidence rows distinguish prepared remarks, analyst-prompted questions, and management responses.
-- Optional market context compares event-date close with next-day and 5-trading-day closes.
+- Optional market context compares event-date close with next-day and 5-trading-day closes through a QVeris market-data tool.
 - `llm_review_pack.json` gives an LLM enough context to draft a memo while keeping claims tied to snippets.
 - Risk/opportunity labels are simple lexical labels, not investment advice.
 
