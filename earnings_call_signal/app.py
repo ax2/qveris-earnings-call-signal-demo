@@ -217,6 +217,7 @@ def _dashboard_html(report: dict[str, Any]) -> str:
             </div>
             <nav class="actions">
               <a class="button" href="/screenshots">Screenshots</a>
+              <a class="button" href="/report">Report</a>
               <a class="button" href="/report/markdown">Markdown report</a>
               <a class="button" href="/health">Health</a>
             </nav>
@@ -264,6 +265,225 @@ def _dashboard_html(report: dict[str, Any]) -> str:
           <section class="section">
             <h2>Article Screenshots</h2>
             <div class="grid screenshots">{screenshot_cards}</div>
+          </section>
+        </main>
+      </body>
+    </html>
+    """
+
+
+def _table_rows(rows: list[dict[str, Any]], fields: list[tuple[str, str]], *, limit: int | None = None) -> str:
+    selected = rows[:limit] if limit else rows
+    return "\n".join(
+        "<tr>"
+        + "".join(f"<td>{_esc(row.get(field))}</td>" for field, _label in fields)
+        + "</tr>"
+        for row in selected
+    )
+
+
+def _report_html(report: dict[str, Any]) -> str:
+    brief = report.get("research_brief") or {}
+    portfolio = report.get("portfolio_view") or {}
+    qveris = report.get("qveris") or {}
+    tools = qveris.get("tools") or {}
+    analyses = report.get("analyses") or []
+    themes = list((report.get("themes") or {}).keys())
+
+    questions = "\n".join(
+        f"<li>{_esc(question)}</li>" for question in brief.get("diligence_questions") or []
+    )
+    tool_rows = "\n".join(
+        [
+            f"<tr><td>Transcript dates</td><td><code>{_esc(tools.get('dates_tool_id'))}</code></td><td>{_esc(tools.get('dates_tool_rank'))}</td></tr>",
+            f"<tr><td>Transcript content</td><td><code>{_esc(tools.get('transcript_tool_id'))}</code></td><td>{_esc(tools.get('transcript_tool_rank'))}</td></tr>",
+        ]
+    )
+    totals = portfolio.get("theme_totals") or {}
+    labels = portfolio.get("theme_labels") or {}
+    source_contexts = portfolio.get("theme_source_contexts") or {}
+    leaders = portfolio.get("theme_leaders") or {}
+    theme_rows = "\n".join(
+        f"""
+        <tr>
+          <td>{_esc(theme)}</td>
+          <td class="num">{_esc(count)}</td>
+          <td class="num">{_esc((labels.get(theme) or {}).get("opportunity", 0))}</td>
+          <td class="num">{_esc((labels.get(theme) or {}).get("risk", 0))}</td>
+          <td class="num">{_esc((source_contexts.get(theme) or {}).get("management_active", 0))}</td>
+          <td class="num">{_esc((source_contexts.get(theme) or {}).get("analyst_prompted", 0))}</td>
+          <td>{_esc(leaders.get(theme, "-"))}</td>
+        </tr>
+        """
+        for theme, count in totals.items()
+    )
+    momentum_rows = _table_rows(
+        portfolio.get("theme_momentum") or [],
+        [
+            ("symbol", "Symbol"),
+            ("theme", "Theme"),
+            ("latest_period", "Latest"),
+            ("previous_period", "Previous"),
+            ("latest_per_1k", "Latest / 1k"),
+            ("previous_per_1k", "Previous / 1k"),
+            ("delta_per_1k", "Delta"),
+        ],
+        limit=16,
+    )
+    period_rows = "\n".join(
+        f"""
+        <tr>
+          <td>{_esc(row.get("symbol"))}</td>
+          <td>{_esc(row.get("period"))}</td>
+          <td>{_esc(row.get("date"))}</td>
+          <td class="num">{_esc(row.get("word_count_estimate"))}</td>
+          <td class="num">{_esc(row.get("speaker_count"))}</td>
+          {''.join(f'<td class="num">{_esc(((row.get("themes") or {}).get(theme) or {}).get("mentions", 0))}</td>' for theme in themes)}
+        </tr>
+        """
+        for row in analyses
+    )
+    theme_head_cells = "".join(f"<th class=\"num\">{_esc(theme)}</th>" for theme in themes)
+    timeline_rows = _table_rows(
+        report.get("research_timeline") or [],
+        [
+            ("symbol", "Symbol"),
+            ("period", "Period"),
+            ("date", "Date"),
+            ("strongest_theme", "Strongest theme"),
+            ("strongest_theme_mentions", "Mentions"),
+            ("next_return_pct", "Next return"),
+            ("latest_gross_margin_pct", "Gross margin"),
+            ("latest_operating_margin_pct", "Op margin"),
+        ],
+    )
+    fundamentals_rows = _table_rows(
+        [row for row in report.get("fundamentals_context") or [] if row.get("status") != "unavailable"],
+        [
+            ("symbol", "Symbol"),
+            ("fiscal_year", "FY"),
+            ("revenue", "Revenue"),
+            ("gross_margin_pct", "Gross margin"),
+            ("operating_margin_pct", "Op margin"),
+            ("return_on_invested_capital_pct", "ROIC"),
+            ("capex_to_revenue_pct", "Capex / revenue"),
+        ],
+    )
+    news_rows = _table_rows(
+        [row for row in report.get("news_context") or [] if row.get("status") != "unavailable"],
+        [
+            ("symbol", "Symbol"),
+            ("published_at", "Published"),
+            ("publisher", "Publisher"),
+            ("news_topics", "Topics"),
+            ("title", "Title"),
+        ],
+        limit=16,
+    )
+    evidence_items = "\n".join(
+        f"""
+        <article class="evidence">
+          <div>{_esc(item.get("symbol"))} · {_esc(item.get("period"))} · {_esc(item.get("theme"))} · {_esc(item.get("label"))} / {_esc(item.get("source_context"))}</div>
+          <p>{_esc(item.get("speaker"))}: {_esc(item.get("snippet"))}</p>
+        </article>
+        """
+        for row in analyses
+        for theme_payload in (row.get("themes") or {}).values()
+        for item in (theme_payload.get("snippets") or [])[:1]
+    )
+
+    return f"""
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Earnings Call Signal Report</title>
+        <style>
+          :root {{ --bg:#f4f7fb; --panel:#fff; --ink:#172033; --muted:#647084; --line:#dfe6ef; --blue:#2563eb; --teal:#0f766e; }}
+          * {{ box-sizing: border-box; }}
+          body {{ margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--bg); color:var(--ink); }}
+          main {{ max-width: 1180px; margin:0 auto; padding:34px 24px 64px; }}
+          header {{ display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:22px; }}
+          h1 {{ font-size:40px; line-height:1.08; margin:0 0 10px; letter-spacing:0; }}
+          h2 {{ font-size:22px; margin:0 0 16px; }}
+          p {{ margin:0; color:var(--muted); line-height:1.55; }}
+          code {{ background:#eef3f8; border-radius:6px; padding:2px 6px; word-break:break-all; }}
+          .actions {{ display:flex; gap:10px; flex-wrap:wrap; }}
+          .button {{ border:1px solid var(--line); background:var(--panel); border-radius:8px; padding:10px 13px; text-decoration:none; color:var(--ink); font-size:14px; }}
+          .section {{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px; margin-top:18px; overflow:auto; }}
+          .brief {{ border-left:4px solid var(--blue); }}
+          ol {{ margin:14px 0 0; padding-left:24px; }}
+          li {{ margin:0 0 10px; line-height:1.5; }}
+          table {{ width:100%; border-collapse:collapse; font-size:14px; }}
+          th {{ text-align:left; background:#eef3f8; color:#334155; font-weight:600; }}
+          th, td {{ padding:11px 12px; border-bottom:1px solid #eef2f6; vertical-align:top; }}
+          tbody tr:nth-child(even) {{ background:#fafcff; }}
+          .num {{ text-align:right; font-variant-numeric:tabular-nums; }}
+          .evidence {{ border:1px solid var(--line); border-radius:10px; padding:14px; margin:12px 0; background:#fff; }}
+          .evidence div {{ color:var(--teal); font-weight:700; font-size:13px; margin-bottom:8px; }}
+          .evidence p {{ color:#273449; }}
+          @media (max-width: 900px) {{ header {{ display:block; }} .actions {{ margin-top:16px; }} h1 {{ font-size:32px; }} }}
+        </style>
+      </head>
+      <body>
+        <main>
+          <header>
+            <div>
+              <h1>Earnings Call Signal Report: {_esc(", ".join(report.get("symbols") or []))}</h1>
+              <p>Generated at <code>{_esc(report.get("generated_at"))}</code> with QVeris search + execute. Elapsed: <code>{_esc(report.get("elapsed_s"))}s</code>.</p>
+            </div>
+            <nav class="actions">
+              <a class="button" href="/">Dashboard</a>
+              <a class="button" href="/report/markdown">Markdown</a>
+              <a class="button" href="/screenshots">Screenshots</a>
+            </nav>
+          </header>
+
+          <section class="section brief">
+            <h2>Research Brief</h2>
+            <p><b>{_esc(brief.get("headline"))}</b></p>
+            <ol>{questions}</ol>
+          </section>
+
+          <section class="section">
+            <h2>QVeris Tool Discovery</h2>
+            <table><thead><tr><th>Tool</th><th>Tool ID</th><th class="num">Search rank</th></tr></thead><tbody>{tool_rows}</tbody></table>
+          </section>
+
+          <section class="section">
+            <h2>Portfolio Theme View</h2>
+            <table><thead><tr><th>Theme</th><th class="num">Total</th><th class="num">Opportunity</th><th class="num">Risk</th><th class="num">Management active</th><th class="num">Analyst prompted</th><th>Leader</th></tr></thead><tbody>{theme_rows}</tbody></table>
+          </section>
+
+          <section class="section">
+            <h2>Theme Momentum</h2>
+            <table><thead><tr><th>Symbol</th><th>Theme</th><th>Latest</th><th>Previous</th><th>Latest / 1k</th><th>Previous / 1k</th><th>Delta</th></tr></thead><tbody>{momentum_rows}</tbody></table>
+          </section>
+
+          <section class="section">
+            <h2>Period Summaries</h2>
+            <table><thead><tr><th>Symbol</th><th>Period</th><th>Date</th><th class="num">Words</th><th class="num">Speakers</th>{theme_head_cells}</tr></thead><tbody>{period_rows}</tbody></table>
+          </section>
+
+          <section class="section">
+            <h2>Research Timeline</h2>
+            <table><thead><tr><th>Symbol</th><th>Period</th><th>Date</th><th>Strongest theme</th><th>Mentions</th><th>Next return</th><th>Gross margin</th><th>Op margin</th></tr></thead><tbody>{timeline_rows}</tbody></table>
+          </section>
+
+          <section class="section">
+            <h2>Fundamentals Context</h2>
+            <table><thead><tr><th>Symbol</th><th>FY</th><th>Revenue</th><th>Gross margin</th><th>Op margin</th><th>ROIC</th><th>Capex / revenue</th></tr></thead><tbody>{fundamentals_rows}</tbody></table>
+          </section>
+
+          <section class="section">
+            <h2>News Context</h2>
+            <table><thead><tr><th>Symbol</th><th>Published</th><th>Publisher</th><th>Topics</th><th>Title</th></tr></thead><tbody>{news_rows}</tbody></table>
+          </section>
+
+          <section class="section">
+            <h2>Evidence Snippets</h2>
+            {evidence_items}
           </section>
         </main>
       </body>
@@ -354,6 +574,17 @@ def latest_markdown_report() -> str:
     if not report_path.exists():
         return "No generated report found. Run POST /run first."
     return report_path.read_text(encoding="utf-8")
+
+
+@app.get("/report", response_class=HTMLResponse)
+def latest_html_report() -> str:
+    report = _load_latest_report()
+    if not report:
+        return """
+        <!doctype html>
+        <html><body><main><h1>No generated report found</h1><p>Run POST /run first.</p></main></body></html>
+        """
+    return _report_html(report)
 
 
 @app.post("/run")

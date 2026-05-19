@@ -68,6 +68,13 @@ curl --noproxy '*' -s http://127.0.0.1:8092/run \
   -d '{"symbols":["AAPL","NVDA"],"quarters":2,"themes":["AI","Margin","Guidance"]}'
 ```
 
+Browser pages:
+
+- `GET /` shows the latest dashboard from `outputs/earnings_call_signal_report.json`.
+- `GET /report` shows the latest report as an HTML page.
+- `GET /report/markdown` shows the latest Markdown report.
+- `GET /screenshots` shows the generated article screenshot gallery.
+
 ## What makes the output useful
 
 - `theme_matrix.csv` is ready for spreadsheet analysis.
