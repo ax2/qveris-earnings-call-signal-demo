@@ -31,6 +31,38 @@ DEFAULT_THEMES: dict[str, list[str]] = {
     "Guidance": ["guidance", "outlook", "forecast", "next quarter"],
 }
 
+EXTENDED_THEME_ADDITIONS: dict[str, list[str]] = {
+    "SupplyChain": [
+        "supply chain",
+        "inventory",
+        "channel inventory",
+        "supplier",
+        "component",
+        "logistics",
+        "capacity",
+        "lead time",
+    ],
+    "Pricing": [
+        "pricing",
+        "price",
+        "ASP",
+        "average selling price",
+        "discount",
+        "promotion",
+        "mix",
+    ],
+    "Competition": [
+        "competition",
+        "competitive",
+        "competitor",
+        "market share",
+        "share gains",
+        "share loss",
+    ],
+}
+
+EXTENDED_THEMES: dict[str, list[str]] = {**DEFAULT_THEMES, **EXTENDED_THEME_ADDITIONS}
+
 OPPORTUNITY_WORDS = {
     "growth",
     "strong",
@@ -150,10 +182,64 @@ def _speaker_role(name: str | None, snippet: str) -> str:
     return "management"
 
 
+def _qa_start(content: str) -> int | None:
+    markers = [
+        "question-and-answer session",
+        "question and answer session",
+        "questions-and-answers session",
+        "q&a session",
+    ]
+    lower = content.lower()
+    positions = [lower.find(marker) for marker in markers if lower.find(marker) >= 0]
+    return min(positions) if positions else None
+
+
+def _source_context(
+    *,
+    content: str,
+    start: int,
+    speaker: str | None,
+    snippet: str,
+    qa_offset: int | None,
+) -> dict[str, str]:
+    if qa_offset is not None and start >= qa_offset:
+        segment = "qa"
+    else:
+        segment = "prepared_remarks"
+
+    role = _speaker_role(speaker, snippet)
+    if role == "operator":
+        source = "operator"
+    elif segment == "prepared_remarks":
+        source = "management_active"
+    elif role == "question":
+        source = "analyst_prompted"
+    else:
+        source = "management_response_to_question"
+
+    return {
+        "transcript_segment": segment,
+        "speaker_role": role,
+        "source_context": source,
+    }
+
+
 def _per_1k(count: int, words: int) -> float:
     if words <= 0:
         return 0.0
     return round(count * 1000 / words, 3)
+
+
+def select_themes(theme_names: str | list[str] | None = None, *, theme_set: str = "extended") -> dict[str, list[str]]:
+    source = EXTENDED_THEMES if theme_set == "extended" else DEFAULT_THEMES
+    if not theme_names:
+        return source
+    requested = (
+        {item.strip() for item in theme_names.split(",") if item.strip()}
+        if isinstance(theme_names, str)
+        else {item.strip() for item in theme_names if item.strip()}
+    )
+    return {name: terms for name, terms in source.items() if name in requested}
 
 
 def analyze_transcript(
@@ -167,6 +253,7 @@ def analyze_transcript(
     speaker_turns = re.findall(r"(?:^|\n)([A-Z][A-Za-z .'\-]{1,70}):\s", content)
     speaker_counts = Counter(s.strip() for s in speaker_turns)
     word_count = len(re.findall(r"[A-Za-z0-9$%.\-]+", content))
+    qa_offset = _qa_start(content)
 
     theme_rows: dict[str, dict[str, Any]] = {}
     evidence: list[dict[str, Any]] = []
@@ -174,14 +261,24 @@ def analyze_transcript(
         matches = list(pattern.finditer(content))
         labels: Counter[str] = Counter()
         speakers: Counter[str] = Counter()
+        source_contexts: Counter[str] = Counter()
+        transcript_segments: Counter[str] = Counter()
         snippets: list[dict[str, str]] = []
         for match in matches:
             snippet = _sentence_window(content, match.start(), match.end())
             speaker = _speaker_before(content, match.start()) or "Unknown"
             label = _label_context(snippet)
-            role = _speaker_role(speaker, snippet)
+            context = _source_context(
+                content=content,
+                start=match.start(),
+                speaker=speaker,
+                snippet=snippet,
+                qa_offset=qa_offset,
+            )
             labels[label] += 1
             speakers[speaker] += 1
+            source_contexts[context["source_context"]] += 1
+            transcript_segments[context["transcript_segment"]] += 1
             row = {
                 "symbol": period.symbol,
                 "period": period.label,
@@ -189,7 +286,9 @@ def analyze_transcript(
                 "theme": theme,
                 "term": match.group(0),
                 "speaker": speaker,
-                "speaker_role": role,
+                "speaker_role": context["speaker_role"],
+                "transcript_segment": context["transcript_segment"],
+                "source_context": context["source_context"],
                 "label": label,
                 "snippet": snippet,
             }
@@ -201,6 +300,8 @@ def analyze_transcript(
             "mentions": len(matches),
             "mentions_per_1k_words": _per_1k(len(matches), word_count),
             "labels": dict(labels),
+            "source_contexts": dict(source_contexts),
+            "transcript_segments": dict(transcript_segments),
             "top_speakers": speakers.most_common(5),
             "snippets": snippets,
         }
@@ -303,6 +404,7 @@ class EarningsCallSignalAnalyzer:
         symbols: list[str],
         quarters_per_symbol: int = 2,
         themes: dict[str, list[str]] | None = None,
+        include_market_context: bool = False,
     ) -> dict[str, Any]:
         started = time.monotonic()
         clean_symbols = [symbol.strip().upper() for symbol in symbols if symbol.strip()]
@@ -352,6 +454,11 @@ class EarningsCallSignalAnalyzer:
             analyses.append(analyze_transcript(period=period, content=content, themes=theme_map))
 
         portfolio_view = build_portfolio_view(analyses)
+        market_context: list[dict[str, Any]] = []
+        if include_market_context:
+            from .market import fetch_market_context
+
+            market_context = await fetch_market_context([period.__dict__ for period in selected_periods])
         return {
             "demo": "qveris-earnings-call-signal-demo",
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -375,7 +482,9 @@ class EarningsCallSignalAnalyzer:
             "missing_transcripts": missing,
             "analyses": analyses,
             "portfolio_view": portfolio_view,
-            "research_brief": build_research_brief(analyses, portfolio_view),
+            "market_context": market_context,
+            "research_brief": build_research_brief(analyses, portfolio_view, market_context),
+            "llm_review_pack": build_llm_review_pack(analyses, portfolio_view, market_context),
         }
 
 
@@ -394,10 +503,11 @@ def _compact_execute_meta(execution: dict[str, Any]) -> dict[str, Any]:
 
 def build_portfolio_view(analyses: list[dict[str, Any]]) -> dict[str, Any]:
     by_symbol: dict[str, dict[str, Any]] = defaultdict(
-        lambda: {"periods": 0, "themes": Counter(), "labels": Counter()}
+        lambda: {"periods": 0, "themes": Counter(), "labels": Counter(), "source_contexts": Counter()}
     )
     theme_totals: Counter[str] = Counter()
     theme_labels: dict[str, Counter[str]] = defaultdict(Counter)
+    theme_source_contexts: dict[str, Counter[str]] = defaultdict(Counter)
     timeline: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
     for row in analyses:
@@ -407,10 +517,13 @@ def build_portfolio_view(analyses: list[dict[str, Any]]) -> dict[str, Any]:
             count = int(payload.get("mentions") or 0)
             per_1k = float(payload.get("mentions_per_1k_words") or 0)
             labels = Counter(payload.get("labels") or {})
+            source_contexts = Counter(payload.get("source_contexts") or {})
             by_symbol[symbol]["themes"][theme] += count
             by_symbol[symbol]["labels"].update(labels)
+            by_symbol[symbol]["source_contexts"].update(source_contexts)
             theme_totals[theme] += count
             theme_labels[theme].update(labels)
+            theme_source_contexts[theme].update(source_contexts)
             timeline[symbol].append(
                 {
                     "period": row.get("period"),
@@ -419,6 +532,7 @@ def build_portfolio_view(analyses: list[dict[str, Any]]) -> dict[str, Any]:
                     "mentions": count,
                     "mentions_per_1k_words": per_1k,
                     "labels": dict(labels),
+                    "source_contexts": dict(source_contexts),
                 }
             )
 
@@ -427,6 +541,7 @@ def build_portfolio_view(analyses: list[dict[str, Any]]) -> dict[str, Any]:
             "periods": payload["periods"],
             "themes": dict(payload["themes"].most_common()),
             "labels": dict(payload["labels"]),
+            "source_contexts": dict(payload["source_contexts"]),
         }
         for symbol, payload in sorted(by_symbol.items())
     }
@@ -442,6 +557,9 @@ def build_portfolio_view(analyses: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "theme_totals": dict(theme_totals.most_common()),
         "theme_labels": {theme: dict(labels) for theme, labels in theme_labels.items()},
+        "theme_source_contexts": {
+            theme: dict(source_contexts) for theme, source_contexts in theme_source_contexts.items()
+        },
         "by_symbol": normalized,
         "theme_leaders": leaders,
         "theme_momentum": momentum,
@@ -481,11 +599,14 @@ def build_theme_momentum(timeline: dict[str, list[dict[str, Any]]]) -> list[dict
 def build_research_brief(
     analyses: list[dict[str, Any]],
     portfolio_view: dict[str, Any],
+    market_context: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     totals = portfolio_view.get("theme_totals") or {}
     labels = portfolio_view.get("theme_labels") or {}
+    source_contexts = portfolio_view.get("theme_source_contexts") or {}
     leaders = portfolio_view.get("theme_leaders") or {}
     momentum = portfolio_view.get("theme_momentum") or []
+    market_context = market_context or []
 
     top_themes = list(totals.keys())[:5]
     opportunity_themes = sorted(
@@ -511,6 +632,23 @@ def build_research_brief(
             questions.append(
                 f"{theme} 相关风险语境较多，建议检查这些表述是否来自管理层，还是分析师追问。"
             )
+    for theme, counts in source_contexts.items():
+        analyst_count = int((counts or {}).get("analyst_prompted") or 0)
+        management_count = int((counts or {}).get("management_active") or 0)
+        if analyst_count > management_count:
+            questions.append(
+                f"{theme} 更多来自分析师追问，建议判断这是否代表市场关注点而非公司主动叙事。"
+            )
+    for row in sorted(
+        market_context,
+        key=lambda item: abs(float(item.get("next_return_pct") or 0)),
+        reverse=True,
+    )[:3]:
+        if row.get("next_return_pct") is not None:
+            questions.append(
+                f"{row['symbol']} 在 {row['event_date']} 电话会后的下一交易日涨跌为 "
+                f"{row['next_return_pct']}%，建议把价格反应与逐字稿主题变化并读。"
+            )
 
     return {
         "headline": _brief_headline(totals, leaders),
@@ -523,6 +661,16 @@ def build_research_brief(
             {"theme": theme, "count": int((counts or {}).get("risk") or 0)}
             for theme, counts in risk_themes
         ],
+        "source_context_summary": {
+            theme: {
+                "management_active": int((counts or {}).get("management_active") or 0),
+                "analyst_prompted": int((counts or {}).get("analyst_prompted") or 0),
+                "management_response_to_question": int(
+                    (counts or {}).get("management_response_to_question") or 0
+                ),
+            }
+            for theme, counts in source_contexts.items()
+        },
         "diligence_questions": questions[:8],
         "coverage": {
             "transcripts": len(analyses),
@@ -537,6 +685,46 @@ def _brief_headline(totals: dict[str, Any], leaders: dict[str, Any]) -> str:
     top_theme, top_count = next(iter(totals.items()))
     leader = leaders.get(top_theme, "-")
     return f"{top_theme} is the strongest transcript theme ({top_count} mentions), led by {leader}."
+
+
+def build_llm_review_pack(
+    analyses: list[dict[str, Any]],
+    portfolio_view: dict[str, Any],
+    market_context: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    evidence = sorted(
+        [
+            item
+            for row in analyses
+            for item in row.get("evidence", [])
+            if item.get("label") in {"risk", "opportunity"}
+            or item.get("source_context") == "analyst_prompted"
+        ],
+        key=lambda item: (
+            item.get("label") == "neutral",
+            item.get("source_context") != "analyst_prompted",
+            item.get("symbol"),
+            item.get("theme"),
+        ),
+    )[:40]
+    return {
+        "purpose": "Use this pack to draft analyst follow-up questions. Keep every claim tied to evidence snippets.",
+        "guardrails": [
+            "Do not make investment recommendations.",
+            "Separate management's prepared narrative from analyst-prompted topics.",
+            "Quote or cite the evidence snippet before drawing a conclusion.",
+            "Treat market reaction as context, not proof of causality.",
+        ],
+        "portfolio_view": portfolio_view,
+        "market_context": market_context or [],
+        "evidence": evidence,
+        "prompt": (
+            "Based on the portfolio_view, market_context, and evidence rows, draft a concise "
+            "earnings-call review memo. Group observations by theme, flag whether each point "
+            "came from prepared remarks, analyst questions, or management responses, and list "
+            "follow-up questions for human review."
+        ),
+    }
 
 
 def render_markdown(report: dict[str, Any]) -> str:
@@ -580,17 +768,22 @@ def render_markdown(report: dict[str, Any]) -> str:
 
     lines.append("## Portfolio Theme View")
     lines.append("")
-    lines.append("| Theme | Total mentions | Opportunity | Risk | Leading symbol |")
-    lines.append("|---|---:|---:|---:|---|")
+    lines.append(
+        "| Theme | Total mentions | Opportunity | Risk | Management active | Analyst prompted | Leading symbol |"
+    )
+    lines.append("|---|---:|---:|---:|---:|---:|---|")
     portfolio = report.get("portfolio_view") or {}
     totals = portfolio.get("theme_totals") or {}
     leaders = portfolio.get("theme_leaders") or {}
     labels = portfolio.get("theme_labels") or {}
+    source_contexts = portfolio.get("theme_source_contexts") or {}
     for theme, count in totals.items():
         label_counts = labels.get(theme) or {}
+        source_counts = source_contexts.get(theme) or {}
         lines.append(
             f"| {theme} | {count} | {label_counts.get('opportunity', 0)} | "
-            f"{label_counts.get('risk', 0)} | {leaders.get(theme, '-')} |"
+            f"{label_counts.get('risk', 0)} | {source_counts.get('management_active', 0)} | "
+            f"{source_counts.get('analyst_prompted', 0)} | {leaders.get(theme, '-')} |"
         )
     lines.append("")
 
@@ -608,31 +801,51 @@ def render_markdown(report: dict[str, Any]) -> str:
 
     lines.append("## Period Summaries")
     lines.append("")
-    lines.append(
-        "| Symbol | Period | Date | Words | Speakers | AI | Margin | China | Capex | Guidance |"
-    )
-    lines.append("|---|---|---|---:|---:|---:|---:|---:|---:|---:|")
+    report_themes = list((report.get("themes") or {}).keys())
+    lines.append("| Symbol | Period | Date | Words | Speakers | " + " | ".join(report_themes) + " |")
+    lines.append("|---|---|---|---:|---:|" + "|".join(["---:"] * len(report_themes)) + "|")
     for row in report.get("analyses") or []:
         themes = row.get("themes") or {}
 
         def mentions(name: str) -> int:
             return int((themes.get(name) or {}).get("mentions") or 0)
 
+        theme_cells = " | ".join(str(mentions(theme)) for theme in report_themes)
         lines.append(
-            "| {symbol} | {period} | {date} | {words} | {speakers} | {ai} | {margin} | {china} | {capex} | {guidance} |".format(
-                symbol=row.get("symbol"),
-                period=row.get("period"),
-                date=row.get("date"),
-                words=row.get("word_count_estimate"),
-                speakers=row.get("speaker_count"),
-                ai=mentions("AI"),
-                margin=mentions("Margin"),
-                china=mentions("China"),
-                capex=mentions("Capex"),
-                guidance=mentions("Guidance"),
-            )
+            f"| {row.get('symbol')} | {row.get('period')} | {row.get('date')} | "
+            f"{row.get('word_count_estimate')} | {row.get('speaker_count')} | {theme_cells} |"
         )
     lines.append("")
+
+    market_context = report.get("market_context") or []
+    if market_context:
+        lines.append("## Market Context")
+        lines.append("")
+        lines.append(
+            "| Symbol | Event date | Status | Base close | Next close | Next return | 5-day return |"
+        )
+        lines.append("|---|---|---|---:|---:|---:|---:|")
+        for row in market_context:
+            lines.append(
+                f"| {row.get('symbol')} | {row.get('event_date')} | {row.get('status')} | "
+                f"{row.get('base_close')} | {row.get('next_close')} | "
+                f"{row.get('next_return_pct')}% | {row.get('fifth_return_pct')}% |"
+            )
+        unavailable = [row for row in market_context if row.get("status") != "ok"]
+        if unavailable:
+            lines.append("")
+            lines.append(
+                "Some market context rows are unavailable; check `market_context.csv` for status and error details."
+            )
+        lines.append("")
+
+    llm_pack = report.get("llm_review_pack") or {}
+    if llm_pack:
+        lines.append("## LLM Review Pack")
+        lines.append("")
+        lines.append("- A structured `llm_review_pack.json` is exported for drafting review memos.")
+        lines.append("- Guardrails: do not make investment recommendations; keep claims tied to snippets.")
+        lines.append("")
 
     lines.append("## Evidence Snippets")
     for row in report.get("analyses") or []:
@@ -646,7 +859,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             lines.append(f"**{theme}**")
             for snippet in snippets[:2]:
                 lines.append(
-                    f"- [{snippet.get('label')}/{snippet.get('speaker_role')}] "
+                    f"- [{snippet.get('label')}/{snippet.get('source_context')}] "
                     f"{snippet.get('speaker')}: {snippet.get('snippet')}"
                 )
     lines.append("")
@@ -666,17 +879,26 @@ def write_outputs(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
     markdown_path = output_dir / "earnings_call_signal_report.md"
     matrix_path = output_dir / "theme_matrix.csv"
     evidence_path = output_dir / "evidence_ledger.csv"
+    market_path = output_dir / "market_context.csv"
+    llm_pack_path = output_dir / "llm_review_pack.json"
 
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     markdown_path.write_text(render_markdown(report), encoding="utf-8")
     _write_theme_matrix(report, matrix_path)
     _write_evidence_ledger(report, evidence_path)
+    _write_market_context(report, market_path)
+    llm_pack_path.write_text(
+        json.dumps(report.get("llm_review_pack") or {}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
     return {
         "json": str(json_path),
         "markdown": str(markdown_path),
         "theme_matrix": str(matrix_path),
         "evidence_ledger": str(evidence_path),
+        "market_context": str(market_path),
+        "llm_review_pack": str(llm_pack_path),
     }
 
 
@@ -722,6 +944,8 @@ def _write_evidence_ledger(report: dict[str, Any], path: Path) -> None:
         "label",
         "speaker",
         "speaker_role",
+        "transcript_segment",
+        "source_context",
         "snippet",
     ]
     with path.open("w", newline="", encoding="utf-8") as file:
@@ -731,3 +955,24 @@ def _write_evidence_ledger(report: dict[str, Any], path: Path) -> None:
             for evidence in row.get("evidence") or []:
                 writer.writerow({field: evidence.get(field) for field in fieldnames})
 
+
+def _write_market_context(report: dict[str, Any], path: Path) -> None:
+    fieldnames = [
+        "symbol",
+        "event_date",
+        "status",
+        "error",
+        "base_trading_date",
+        "base_close",
+        "next_trading_date",
+        "next_close",
+        "next_return_pct",
+        "fifth_trading_date",
+        "fifth_close",
+        "fifth_return_pct",
+    ]
+    with path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in report.get("market_context") or []:
+            writer.writerow({field: row.get(field) for field in fieldnames})

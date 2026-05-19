@@ -10,8 +10,11 @@
 
 - 自动发现并调用 QVeris 上的财报电话会工具。
 - 拉取 AAPL、NVDA、TSM 等公司的最近若干期 earnings call transcript。
-- 按 AI、Margin、Guidance、China、Capex 等主题做跨公司对比。
+- 按 AI、Margin、Guidance、China、Capex、Supply Chain、Pricing、Competition 等主题做跨公司对比。
 - 输出每个主题的提及次数、每千词频率、风险/机会语境和季度变化。
+- 区分管理层主动叙述、分析师追问和管理层对问题的回应。
+- 可选接入电话会后股价变化，作为市场反应背景。
+- 生成 `llm_review_pack.json`，方便把证据台账交给 LLM 生成复核问题，但仍保留原文证据链。
 - 保留证据台账 CSV，方便回到原文复核。
 
 ## 一次真实运行
@@ -53,7 +56,9 @@ cp .env.example .env
 uv run earnings-signal \
   --symbols AAPL,NVDA,TSM \
   --quarters 2 \
-  --themes AI,Margin,Guidance
+  --theme-set extended \
+  --themes AI,Margin,Guidance,SupplyChain,Pricing,Competition \
+  --market-context
 ```
 
 输出文件：
@@ -62,6 +67,8 @@ uv run earnings-signal \
 - `earnings_call_signal_report.json`
 - `theme_matrix.csv`
 - `evidence_ledger.csv`
+- `market_context.csv`
+- `llm_review_pack.json`
 
 代码地址：
 
@@ -69,11 +76,11 @@ https://github.com/ax2/qveris-earnings-call-signal-demo
 
 ## 可以继续扩展的方向
 
-这个程序目前只做了轻量的文本规则分析，后续可以继续扩展：
+这个程序已经补上了第一批扩展：更多主题词库、发言来源分类、电话会后价格背景和 LLM 复核包。后续还可以继续扩展：
 
-- 增加更多主题词库，例如 supply chain、pricing、competition。
-- 对同一主题做更细的语义分类，区分“管理层主动叙述”和“分析师追问”。
-- 接入价格、财务指标或新闻数据，观察电话会主题变化和市场反应之间的关系。
-- 把证据台账交给 LLM 生成结构化问题清单，但仍然保留原文证据链。
+- 引入财务指标和新闻数据，观察电话会主题变化、基本面变化和外部事件之间的关系。
+- 用更细的模型分类替代轻量规则，例如把 risk/opportunity 进一步拆成需求、供给、费用、监管、竞争等维度。
+- 把同一公司的多季度主题变化做成长期时间序列。
+- 对 evidence ledger 做人工标注，形成可评估的投研语义分类样本。
 
 真正有价值的不是把逐字稿总结成几段话，而是把数据发现、调用、对比和证据留存这一整条链路跑通。

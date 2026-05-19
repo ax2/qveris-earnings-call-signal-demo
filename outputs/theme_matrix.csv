@@ -1,5 +1,5 @@
-symbol,period,date,words,speakers,AI,Margin,Guidance,AI_per_1k_words,Margin_per_1k_words,Guidance_per_1k_words
-AAPL,FY2026 Q2,2026-04-30,8945,13,17,20,10,1.901,2.236,1.118
-AAPL,FY2026 Q1,2026-01-29,8384,15,21,16,12,2.505,1.908,1.431
-NVDA,FY2026 Q4,2026-02-25,8853,16,78,2,5,8.811,0.226,0.565
-NVDA,FY2026 Q3,2025-11-19,8906,12,94,1,6,10.555,0.112,0.674
+symbol,period,date,words,speakers,AI,Margin,Guidance,SupplyChain,Pricing,Competition,AI_per_1k_words,Margin_per_1k_words,Guidance_per_1k_words,SupplyChain_per_1k_words,Pricing_per_1k_words,Competition_per_1k_words
+AAPL,FY2026 Q2,2026-04-30,8945,13,17,20,10,11,7,4,1.901,2.236,1.118,1.23,0.783,0.447
+AAPL,FY2026 Q1,2026-01-29,8384,15,21,16,12,10,19,3,2.505,1.908,1.431,1.193,2.266,0.358
+NVDA,FY2026 Q4,2026-02-25,8853,16,78,2,5,13,4,0,8.811,0.226,0.565,1.468,0.452,0.0
+NVDA,FY2026 Q3,2025-11-19,8906,12,94,1,6,22,4,2,10.555,0.112,0.674,2.47,0.449,0.225

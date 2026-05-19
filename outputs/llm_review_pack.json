@@ -1,0 +1,820 @@
+{
+  "purpose": "Use this pack to draft analyst follow-up questions. Keep every claim tied to evidence snippets.",
+  "guardrails": [
+    "Do not make investment recommendations.",
+    "Separate management's prepared narrative from analyst-prompted topics.",
+    "Quote or cite the evidence snippet before drawing a conclusion.",
+    "Treat market reaction as context, not proof of causality."
+  ],
+  "portfolio_view": {
+    "theme_totals": {
+      "AI": 210,
+      "SupplyChain": 56,
+      "Margin": 39,
+      "Pricing": 34,
+      "Guidance": 33,
+      "Competition": 9
+    },
+    "theme_labels": {
+      "AI": {
+        "neutral": 118,
+        "opportunity": 92
+      },
+      "Margin": {
+        "neutral": 26,
+        "opportunity": 8,
+        "risk": 5
+      },
+      "Guidance": {
+        "neutral": 9,
+        "risk": 5,
+        "opportunity": 19
+      },
+      "SupplyChain": {
+        "neutral": 29,
+        "opportunity": 26,
+        "risk": 1
+      },
+      "Pricing": {
+        "opportunity": 12,
+        "neutral": 19,
+        "risk": 3
+      },
+      "Competition": {
+        "opportunity": 2,
+        "neutral": 5,
+        "risk": 2
+      }
+    },
+    "theme_source_contexts": {
+      "AI": {
+        "management_active": 116,
+        "management_response_to_question": 78,
+        "analyst_prompted": 16
+      },
+      "Margin": {
+        "management_active": 38,
+        "management_response_to_question": 1
+      },
+      "Guidance": {
+        "management_active": 27,
+        "management_response_to_question": 5,
+        "analyst_prompted": 1
+      },
+      "SupplyChain": {
+        "management_active": 34,
+        "management_response_to_question": 20,
+        "analyst_prompted": 2
+      },
+      "Pricing": {
+        "management_active": 30,
+        "management_response_to_question": 2,
+        "analyst_prompted": 2
+      },
+      "Competition": {
+        "management_active": 7,
+        "management_response_to_question": 2
+      }
+    },
+    "by_symbol": {
+      "AAPL": {
+        "periods": 2,
+        "themes": {
+          "AI": 38,
+          "Margin": 36,
+          "Pricing": 26,
+          "Guidance": 22,
+          "SupplyChain": 21,
+          "Competition": 7
+        },
+        "labels": {
+          "neutral": 89,
+          "opportunity": 45,
+          "risk": 16
+        },
+        "source_contexts": {
+          "management_active": 150
+        }
+      },
+      "NVDA": {
+        "periods": 2,
+        "themes": {
+          "AI": 172,
+          "SupplyChain": 35,
+          "Guidance": 11,
+          "Pricing": 8,
+          "Margin": 3,
+          "Competition": 2
+        },
+        "labels": {
+          "opportunity": 114,
+          "neutral": 117
+        },
+        "source_contexts": {
+          "management_active": 102,
+          "management_response_to_question": 108,
+          "analyst_prompted": 21
+        }
+      }
+    },
+    "theme_leaders": {
+      "AI": "NVDA",
+      "Margin": "AAPL",
+      "Guidance": "AAPL",
+      "SupplyChain": "NVDA",
+      "Pricing": "AAPL",
+      "Competition": "AAPL"
+    },
+    "theme_momentum": [
+      {
+        "symbol": "NVDA",
+        "theme": "AI",
+        "latest_period": "FY2026 Q4",
+        "previous_period": "FY2026 Q3",
+        "latest_per_1k": 8.811,
+        "previous_per_1k": 10.555,
+        "delta_per_1k": -1.744
+      },
+      {
+        "symbol": "AAPL",
+        "theme": "Pricing",
+        "latest_period": "FY2026 Q2",
+        "previous_period": "FY2026 Q1",
+        "latest_per_1k": 0.783,
+        "previous_per_1k": 2.266,
+        "delta_per_1k": -1.483
+      },
+      {
+        "symbol": "NVDA",
+        "theme": "SupplyChain",
+        "latest_period": "FY2026 Q4",
+        "previous_period": "FY2026 Q3",
+        "latest_per_1k": 1.468,
+        "previous_per_1k": 2.47,
+        "delta_per_1k": -1.002
+      },
+      {
+        "symbol": "AAPL",
+        "theme": "AI",
+        "latest_period": "FY2026 Q2",
+        "previous_period": "FY2026 Q1",
+        "latest_per_1k": 1.901,
+        "previous_per_1k": 2.505,
+        "delta_per_1k": -0.604
+      },
+      {
+        "symbol": "AAPL",
+        "theme": "Margin",
+        "latest_period": "FY2026 Q2",
+        "previous_period": "FY2026 Q1",
+        "latest_per_1k": 2.236,
+        "previous_per_1k": 1.908,
+        "delta_per_1k": 0.328
+      },
+      {
+        "symbol": "AAPL",
+        "theme": "Guidance",
+        "latest_period": "FY2026 Q2",
+        "previous_period": "FY2026 Q1",
+        "latest_per_1k": 1.118,
+        "previous_per_1k": 1.431,
+        "delta_per_1k": -0.313
+      },
+      {
+        "symbol": "NVDA",
+        "theme": "Competition",
+        "latest_period": "FY2026 Q4",
+        "previous_period": "FY2026 Q3",
+        "latest_per_1k": 0.0,
+        "previous_per_1k": 0.225,
+        "delta_per_1k": -0.225
+      },
+      {
+        "symbol": "NVDA",
+        "theme": "Margin",
+        "latest_period": "FY2026 Q4",
+        "previous_period": "FY2026 Q3",
+        "latest_per_1k": 0.226,
+        "previous_per_1k": 0.112,
+        "delta_per_1k": 0.114
+      },
+      {
+        "symbol": "NVDA",
+        "theme": "Guidance",
+        "latest_period": "FY2026 Q4",
+        "previous_period": "FY2026 Q3",
+        "latest_per_1k": 0.565,
+        "previous_per_1k": 0.674,
+        "delta_per_1k": -0.109
+      },
+      {
+        "symbol": "AAPL",
+        "theme": "Competition",
+        "latest_period": "FY2026 Q2",
+        "previous_period": "FY2026 Q1",
+        "latest_per_1k": 0.447,
+        "previous_per_1k": 0.358,
+        "delta_per_1k": 0.089
+      },
+      {
+        "symbol": "AAPL",
+        "theme": "SupplyChain",
+        "latest_period": "FY2026 Q2",
+        "previous_period": "FY2026 Q1",
+        "latest_per_1k": 1.23,
+        "previous_per_1k": 1.193,
+        "delta_per_1k": 0.037
+      },
+      {
+        "symbol": "NVDA",
+        "theme": "Pricing",
+        "latest_period": "FY2026 Q4",
+        "previous_period": "FY2026 Q3",
+        "latest_per_1k": 0.452,
+        "previous_per_1k": 0.449,
+        "delta_per_1k": 0.003
+      }
+    ]
+  },
+  "market_context": [
+    {
+      "symbol": "NVDA",
+      "event_date": "2026-02-25",
+      "status": "unavailable",
+      "error": "HTTPStatusError: Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v8/finance/chart/NVDA?period1=1762444800&period2=1773158400&interval=1d&events=history' For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+      "base_trading_date": null,
+      "base_close": null,
+      "next_trading_date": null,
+      "next_close": null,
+      "next_return_pct": null,
+      "fifth_trading_date": null,
+      "fifth_close": null,
+      "fifth_return_pct": null
+    },
+    {
+      "symbol": "NVDA",
+      "event_date": "2025-11-19",
+      "status": "unavailable",
+      "error": "HTTPStatusError: Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v8/finance/chart/NVDA?period1=1762444800&period2=1773158400&interval=1d&events=history' For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+      "base_trading_date": null,
+      "base_close": null,
+      "next_trading_date": null,
+      "next_close": null,
+      "next_return_pct": null,
+      "fifth_trading_date": null,
+      "fifth_close": null,
+      "fifth_return_pct": null
+    },
+    {
+      "symbol": "AAPL",
+      "event_date": "2026-04-30",
+      "status": "unavailable",
+      "error": "HTTPStatusError: Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v8/finance/chart/AAPL?period1=1768579200&period2=1778688000&interval=1d&events=history' For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+      "base_trading_date": null,
+      "base_close": null,
+      "next_trading_date": null,
+      "next_close": null,
+      "next_return_pct": null,
+      "fifth_trading_date": null,
+      "fifth_close": null,
+      "fifth_return_pct": null
+    },
+    {
+      "symbol": "AAPL",
+      "event_date": "2026-01-29",
+      "status": "unavailable",
+      "error": "HTTPStatusError: Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v8/finance/chart/AAPL?period1=1768579200&period2=1778688000&interval=1d&events=history' For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+      "base_trading_date": null,
+      "base_close": null,
+      "next_trading_date": null,
+      "next_close": null,
+      "next_return_pct": null,
+      "fifth_trading_date": null,
+      "fifth_close": null,
+      "fifth_return_pct": null
+    }
+  ],
+  "evidence": [
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Jensen Huang",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...dynamics. Each will contribute to infrastructure growth in the coming years. NVIDIA Corporation is chosen because our singular architecture enables all three transitions. And thus so for any form and modality of AI across all industries, across every phase of AI, across all of the diverse computing needs, in a cloud, and also from cloud to enterprise to robots. One architecture. Toshiya, back to you. Toshiya Hari: We will now open the call for questions. Operator, would you please poll for questions? Sarah: Thank you..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Jensen Huang",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...s. Most of the world's industries haven't really engaged AgenTic AI yet. And they're about to. You know? All the names of companies that that you know we're working with know, whether whether it's autonomous vehicle companies or digital twins for for physical AI for for factories and the number of factories and warehouses being built around the world. Just the number of digital biology startups that are being funded so that we could accelerate drug discovery. All of those different industries are now getting engaged,..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Jensen Huang",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...ringing Claude onto the NVIDIA Corporation platform. And so what what do we have now? NVIDIA Corporation's architecture, taking a step back, NVIDIA Corporation's architecture NVIDIA Corporation's platform, is the singular platform in the world that runs every AI model. We run OpenAI, We run Anthropic. We run XAI. Because of our deep partnership with Elon and x AI, we were able to bring that opportunity to Saudi Arabia to the KSA so that humane could also be hosting opportunity for x AI. We run x AI. We run we run Gem..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Jensen Huang",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...n's architecture, taking a step back, NVIDIA Corporation's architecture NVIDIA Corporation's platform, is the singular platform in the world that runs every AI model. We run OpenAI, We run Anthropic. We run XAI. Because of our deep partnership with Elon and x AI, we were able to bring that opportunity to Saudi Arabia to the KSA so that humane could also be hosting opportunity for x AI. We run x AI. We run we run Gemini. We run thinking machines. Let's see. What else do we run? We run them all. And so not to mention,..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Jensen Huang",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...rm in the world that runs every AI model. We run OpenAI, We run Anthropic. We run XAI. Because of our deep partnership with Elon and x AI, we were able to bring that opportunity to Saudi Arabia to the KSA so that humane could also be hosting opportunity for x AI. We run x AI. We run we run Gemini. We run thinking machines. Let's see. What else do we run? We run them all. And so not to mention, we run the science models, the biology models, DNA models, gene models, chemical models, and all the different fields around..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Jensen Huang",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...ld that runs every AI model. We run OpenAI, We run Anthropic. We run XAI. Because of our deep partnership with Elon and x AI, we were able to bring that opportunity to Saudi Arabia to the KSA so that humane could also be hosting opportunity for x AI. We run x AI. We run we run Gemini. We run thinking machines. Let's see. What else do we run? We run them all. And so not to mention, we run the science models, the biology models, DNA models, gene models, chemical models, and all the different fields around the world. It..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "Guidance",
+      "term": "forecast",
+      "speaker": "Colette Kress",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...time, you haven't seen all the demand that there is. There's possibility of upside to those numbers as we move forward? Colette Kress: Yeah. Thanks, Joe. I'll start first with a response here on that. Yes. That's correct. We are working into our $500 billion forecast. And we are on track for that as we have finished some of the quarters. And now we have several quarters now in front of us to take us through the end of calendar year '26. The number will grow. And we will achieve, I'm sure, additional needs for compute that..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "Pricing",
+      "term": "pricing",
+      "speaker": "Stacy Rasgon",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...old them in the mid-seventies. So I I guess, first of all, what are the biggest cost increases? Is is it just memory, or is it something else? What are you doing to work toward that? Is it how much is, like, you know, cost optimizations versus pre buys versus pricing And then also, how should we think about OpEx growth next year given the revenues seem likely to to grow materially? From from where we're running right now? Colette Kress: Stacy. Let me see if I can start with remembering where we were with the current fisca..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "SupplyChain",
+      "term": "supply chain",
+      "speaker": "Jensen Huang",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...t that as the backdrop, do you see a realistic path for supply to catch up with demand over the next twelve to eighteen months, or or do you think it can extend beyond that time frame? Jensen Huang: Well, as you know, we've done a really good job planning our supply chain. NVIDIA Corporation's supply chain basically includes every technology company in the world. And TSMC and their packaging and our memory vendors and memory partners and all of our system ODMs have done a really good job planning with us. And we were planning..."
+    },
+    {
+      "symbol": "NVDA",
+      "period": "FY2026 Q3",
+      "date": "2025-11-19",
+      "theme": "SupplyChain",
+      "term": "supply chain",
+      "speaker": "Jensen Huang",
+      "speaker_role": "question",
+      "transcript_segment": "qa",
+      "source_context": "analyst_prompted",
+      "label": "opportunity",
+      "snippet": "...a realistic path for supply to catch up with demand over the next twelve to eighteen months, or or do you think it can extend beyond that time frame? Jensen Huang: Well, as you know, we've done a really good job planning our supply chain. NVIDIA Corporation's supply chain basically includes every technology company in the world. And TSMC and their packaging and our memory vendors and memory partners and all of our system ODMs have done a really good job planning with us. And we were planning for a big year. You know, we've see..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Timothy Cook",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...AI, thanks to the unique combination of performance, efficiency and on-device capabilities. When you combine this level of integration with our relentless focus on the customer experience, it becomes clear why Apple platforms are the best place to experience AI. Now let's turn to services, which set an all-time revenue record with $31 billion. We saw double-digit growth in both developed and emerging markets and set new all-time revenue records across most of the services categories. There's no better place to find..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...igh school students from Windows laptops and Chromebooks to MacBook Neo, completing their transition to an all- Apple district. And in India, leading enterprise software provider, Freshworks, deployed over 5,000 MacBook Pro and MacBook Air to accelerate their AI development. Let's turn to our cash position and capital return program. We ended the quarter with $147 billion in cash and marketable securities. We had $5.8 billion of debt maturities and commercial paper remained unchanged at $2 billion, resulting in $85 b..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Timothy Cook",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...at we're seeing. And we have less flexibility in the supply chain than we normally would. For Mac, in the June quarter, there's 2 factors that are driving the constraints. One is that on the Mac Mini and the Mac Studio, both of these are amazing platforms for AI and Agentic tools. And the customer recognition of that is happening faster than what we had predicted. And so we saw higher-than-expected demand. The second reason is that the customer response to Mac Neo has just been off the charts, with higher-than-expect..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Erik Woodring",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...next question, please? Operator: Our next question is from Erik Woodring of Morgan Stanley. Erik Woodring: Tim, congrats on announcing the partnership with Google, and we're all excited to see what you bring to market later this year. When I think about your AI initiatives, it's clear there are added costs associated with that. We're obviously seeing that flow through in OpEx. Can you help us understand maybe what the revenue upside potential that exists with AI? Many of your competitors have already integrated AI i..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Erik Woodring",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...ing to market later this year. When I think about your AI initiatives, it's clear there are added costs associated with that. We're obviously seeing that flow through in OpEx. Can you help us understand maybe what the revenue upside potential that exists with AI? Many of your competitors have already integrated AI into their devices. And it's just not clear yet what incremental monetization they're seeing because of AI, but you're always disciplined with investing. You obviously have a differentiated product. So how..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Erik Woodring",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...r AI initiatives, it's clear there are added costs associated with that. We're obviously seeing that flow through in OpEx. Can you help us understand maybe what the revenue upside potential that exists with AI? Many of your competitors have already integrated AI into their devices. And it's just not clear yet what incremental monetization they're seeing because of AI, but you're always disciplined with investing. You obviously have a differentiated product. So how do you monetize AI? And what's the time line to reali..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Erik Woodring",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...hrough in OpEx. Can you help us understand maybe what the revenue upside potential that exists with AI? Many of your competitors have already integrated AI into their devices. And it's just not clear yet what incremental monetization they're seeing because of AI, but you're always disciplined with investing. You obviously have a differentiated product. So how do you monetize AI? And what's the time line to realizing that ROI? Then a quick follow-up. Timothy Cook: Well, let me just say that we're bringing intelligence..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Benjamin Reitzes",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": ".... Operator, could we get the next question, please? Operator: The next question will be coming from Ben Reitzes of Melius. Benjamin Reitzes: First question is on Google partnership again. I wanted to understand how you came to that decision with regard to the AI and Siri in particular? And if there's an opportunity for you guys to share in revenue too with that partnership like you do in search? Timothy Cook: Yes. We basically determined that Google's AI technology would provide the most capable foundation for AFM --..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "AI",
+      "term": "AI",
+      "speaker": "Timothy Cook",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...to understand how you came to that decision with regard to the AI and Siri in particular? And if there's an opportunity for you guys to share in revenue too with that partnership like you do in search? Timothy Cook: Yes. We basically determined that Google's AI technology would provide the most capable foundation for AFM -- I'm sorry, Apple Foundation Models. And we believe that we can unlock a lot of experiences and innovate in a key way due to the collaboration. We'll continue to run on the device and run in priva..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Competition",
+      "term": "market share",
+      "speaker": "Timothy Cook",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...the very first time. We've been enormously pleased with how the entire lineup has been received. In fact, the iPhone 17 family is now the most popular lineup in our history when looking at the launch through the March quarter. And according to IDC, we gained market share during the quarter. Mac revenue was $8.4 billion for the March quarter, up 6% from a year ago despite supply constraints driven by higher-than-expected levels of demand. We're delighted with the reception of what is the most advanced Mac lineup in our history..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Competition",
+      "term": "market share",
+      "speaker": "Timothy Cook",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...supply constraints driven by higher-than-expected levels of demand. We're delighted with the reception of what is the most advanced Mac lineup in our history. We set March quarter records for upgraders and customers new to Mac. And according to IDC, we gained market share in the quarter. From Mac Mini to MacBook Pro and everything in between, Mac is the best platform for AI with Apple Silicon delivering exceptional performance, industry-leading efficiency and the ability to run advanced models locally in ways that simply weren..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Competition",
+      "term": "market share",
+      "speaker": "Sreekrishnan Sankarnarayanan",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "risk",
+      "snippet": "...m. Just a lot of discussion on memory pricing. Given that the memory constraint or commodity scarcity is impacting both the smartphone and the PC markets, and Apple, arguably having more purchasing power. Do you think this is a chance for you to increase your market share, both in iPhone and Mac at the expense of competition who might have more constraints in getting access to memory? Timothy Cook: Yes. I don't want to talk about kind of what has happened. And we do believe, as I had shared that iPhone gained share in the Dece..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Competition",
+      "term": "competition",
+      "speaker": "Sreekrishnan Sankarnarayanan",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "risk",
+      "snippet": "...at the memory constraint or commodity scarcity is impacting both the smartphone and the PC markets, and Apple, arguably having more purchasing power. Do you think this is a chance for you to increase your market share, both in iPhone and Mac at the expense of competition who might have more constraints in getting access to memory? Timothy Cook: Yes. I don't want to talk about kind of what has happened. And we do believe, as I had shared that iPhone gained share in the December quarter. And if you look at Mac for the full year..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Guidance",
+      "term": "forecast",
+      "speaker": "Suhasini Chandramouli",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "risk",
+      "snippet": "...those regarding revenue, gross margin, operating expenses, other income and expense, taxes, capital allocation and future business outlook. These statements involve risks and uncertainties that may cause actual results or trends to differ materially from our forecast, including risks related to the potential impact to the company's business and results of operations from macroeconomic conditions, tariffs and other measures and legal and regulatory proceedings. For more information, please refer to the risk factors discuss..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Guidance",
+      "term": "guidance",
+      "speaker": "Timothy Cook",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...head. And with that, let me turn it back over to Tim. Timothy Cook: Thanks, John. Now let me turn to the quarter. Today, Apple is proud to report $111.2 billion in revenue, up 17% from a year ago and a March quarter record, which was above the high end of our guidance range despite supply constraints. Customer enthusiasm for iPhone has been extraordinary with revenue growing 22% year-over-year to achieve a March quarter record. Services reached an all-time revenue record, growing 16% from a year ago, while EPS set a March..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Guidance",
+      "term": "guidance",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...ories and geographic segments. Services revenue was $31 billion, up 16% year-over-year. We saw strong performance across the board with double-digit growth in the vast majority of the markets we track. Company gross margin was 49.3%, above the high end of our guidance range and up 110 basis points sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9 billion, up 24% year-over-year. This was slig..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Guidance",
+      "term": "guidance",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9 billion, up 24% year-over-year. This was slightly above the high end of our guidance range due to a one-time expense in SG&A. Net income was $29.6 billion and diluted earnings per share was $2.01, up 22% year-over-year. Both net income and diluted EPS achieved March quarter records and drove a very strong level of operating cash flow at $28.7..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Guidance",
+      "term": "outlook",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "risk",
+      "snippet": "...r outlook, which includes the types of forward-looking information that Suhasini referred to. Importantly, the color we're providing assumes that global tariff rates, policies and their application remain in effect as of this call and the global macroeconomic outlook does not worsen from today. We expect our June quarter total company revenue to grow by 14% to 17% year-over-year, which comprehends our best view of constraint supply. On iPad, keep in mind, we face a difficult compare driven by the launch of A16-powered iPa..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Guidance",
+      "term": "next quarter",
+      "speaker": "Erik Woodring",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...you, Kevan. [Operator Instructions] Operator, may we have the first question, please? Operator: Certainly. We'll go ahead and take our first question from Erik Woodring with Morgan Stanley. Erik Woodring: And Tim, I'll save the congrats on the Art of war for next quarter, but it's been a pleasure working together. I would love, maybe, Tim, if I could ask you just to maybe contextualize the supply constraints you alluded to in your prepared remarks, meaning how much did demand outpace supply for iPhone and Mac in the March qua..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Guidance",
+      "term": "guidance",
+      "speaker": "Erik Woodring",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...g together. I would love, maybe, Tim, if I could ask you just to maybe contextualize the supply constraints you alluded to in your prepared remarks, meaning how much did demand outpace supply for iPhone and Mac in the March quarter? And does your June quarter guidance also reflect supply constraints for those segments? Or is that kind of an unconstrained guide as you see it today? And then a quick follow-up, please. Timothy Cook: Yes. Erik, thanks for your comments. We were constrained during the March quarter. This was pr..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Guidance",
+      "term": "forecast",
+      "speaker": "Suhasini Chandramouli",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "risk",
+      "snippet": "...those regarding revenue, gross margin, operating expenses, other income and expense, taxes, capital allocation and future business outlook. These statements involve risks and uncertainties that may cause actual results or trends to differ materially from our forecast including risks related to the potential impact to the company's business and results of operations from macroeconomic conditions, tariffs and other measures and legal and regulatory proceedings. For more information, please refer to the risk factors discusse..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Guidance",
+      "term": "guidance",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...growth in almost every market we track. We also reached all-time revenue records for advertising, cloud services, music and payment services with December quarter records on the App Store and video. Company gross margin was at 48.2%, above the high end of our guidance range and up 100 basis points sequentially, driven by favorable mix and leverage. Products gross margin was 40.7%, up 450 basis points sequentially driven by favorable mix and leverage. Services gross margin was 76.5%, up 120 basis points sequentially, driven..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Guidance",
+      "term": "outlook",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "risk",
+      "snippet": "...ng the quarter, we returned nearly $32 billion to shareholders. This included $3.9 billion in dividends and equivalents and $25 billion through open market repurchases of 93 million Apple shares. As we move ahead into the March quarter, I'd like to review our outlook which includes the types of forward-looking information that Suhasini referred to. Importantly, the color we're providing assumes that global tariff rates, policies and their application remain in effect as of this call, and the global macroeconomic outlook d..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Guidance",
+      "term": "outlook",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "risk",
+      "snippet": "...r outlook which includes the types of forward-looking information that Suhasini referred to. Importantly, the color we're providing assumes that global tariff rates, policies and their application remain in effect as of this call, and the global macroeconomic outlook does not worsen from today. We expect our March quarter total company revenue to grow by 13% to 16% year-over-year, which comprehends our best estimates of constrained iPhone supply during the quarter. We expect services revenue to grow at a year-over-year ra..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Guidance",
+      "term": "outlook",
+      "speaker": "Michael Ng",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...ni Chandramouli: Awesome. Thank you, Erik. Operator, could we get the next question, please? Operator: We'll now go to Michael Ng of Goldman Sachs. Michael Ng: Wonderful. I have 2 as well, if I could. First, it was encouraging to hear about the revenue growth outlook of 13% to 16% for the March quarter. I was just wondering if you could talk about any comps that we should be particularly aware of as we kind of think about each of the product categories? I know last year, you guys had MacBook Air with M4, the iPhone 16E, t..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Guidance",
+      "term": "outlook",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...Thanks for the question. Yes, I wouldn't say there's any particular comp issue that we'd note. As you recall, last quarter, we talked about the difficult comparison we had on Mac. But there's nothing that rises to that kind of color that we'd outlined in the outlook. And so I think it's just a continuation of the strong cycle. We're seeing subject to the constraints that I had mentioned in the prepared remarks, and that Tim alluded to a little earlier as well. Michael Ng: Great. Wonderful. And then just on services, adve..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q1",
+      "date": "2026-01-29",
+      "theme": "Guidance",
+      "term": "next quarter",
+      "speaker": "Samik Chatterjee",
+      "speaker_role": "question",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...of highlighted mix as a driver, can you just sort of talk through what are the big differences in mix you're seeing for iPhone 17 versus 16? And did tariffs and tariffs coming in more favorable play a role at all and what you're expecting for tariffs for the next quarter? Kevan Parekh: Yes. So there's a few things to unpack there. So on the overall margin on product side, I think I mentioned that we had favorable mix of products and leverage. I think given the strong iPhone cycle we're seeing, that was, I would say, probably..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Margin",
+      "term": "gross margin",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...other all-time high across all major product categories and geographic segments. Services revenue was $31 billion, up 16% year-over-year. We saw strong performance across the board with double-digit growth in the vast majority of the markets we track. Company gross margin was 49.3%, above the high end of our guidance range and up 110 basis points sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Margin",
+      "term": "gross margin",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...n, up 16% year-over-year. We saw strong performance across the board with double-digit growth in the vast majority of the markets we track. Company gross margin was 49.3%, above the high end of our guidance range and up 110 basis points sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9 billion, up 24% year-over-year. This was slightly above the high end of our guidance range due to a one-time ex..."
+    },
+    {
+      "symbol": "AAPL",
+      "period": "FY2026 Q2",
+      "date": "2026-04-30",
+      "theme": "Margin",
+      "term": "gross margin",
+      "speaker": "Kevan Parekh",
+      "speaker_role": "management",
+      "transcript_segment": "prepared_remarks",
+      "source_context": "management_active",
+      "label": "opportunity",
+      "snippet": "...with double-digit growth in the vast majority of the markets we track. Company gross margin was 49.3%, above the high end of our guidance range and up 110 basis points sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9 billion, up 24% year-over-year. This was slightly above the high end of our guidance range due to a one-time expense in SG&A. Net income was $29.6 billion and diluted earnings per..."
+    }
+  ],
+  "prompt": "Based on the portfolio_view, market_context, and evidence rows, draft a concise earnings-call review memo. Group observations by theme, flag whether each point came from prepared remarks, analyst questions, or management responses, and list follow-up questions for human review."
+}

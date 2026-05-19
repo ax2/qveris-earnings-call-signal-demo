@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from .analyzer import DEFAULT_THEMES, EarningsCallSignalAnalyzer, render_markdown, write_outputs
+from .analyzer import DEFAULT_THEMES, EarningsCallSignalAnalyzer, select_themes, render_markdown, write_outputs
 
 app = FastAPI(title="QVeris Earnings Call Signal Demo")
 
@@ -14,15 +14,16 @@ app = FastAPI(title="QVeris Earnings Call Signal Demo")
 class AnalyzeRequest(BaseModel):
     symbols: list[str] = Field(default_factory=lambda: ["AAPL", "NVDA", "TSM"])
     quarters: int = Field(default=2, ge=1, le=8)
+    theme_set: str = "extended"
     themes: list[str] | None = None
+    market_context: bool = False
     write_files: bool = True
 
 
-def _theme_subset(names: list[str] | None) -> dict[str, list[str]]:
+def _theme_subset(names: list[str] | None, theme_set: str) -> dict[str, list[str]]:
     if not names:
-        return DEFAULT_THEMES
-    requested = set(names)
-    selected = {name: terms for name, terms in DEFAULT_THEMES.items() if name in requested}
+        return select_themes(None, theme_set=theme_set)
+    selected = select_themes(names, theme_set=theme_set)
     return selected or DEFAULT_THEMES
 
 
@@ -51,9 +52,9 @@ def index() -> str:
       <body>
         <main>
           <h1>Earnings Call Signal Analyzer</h1>
-          <p>Search QVeris for earnings-call transcript tools, execute them, and turn long transcripts into a source-backed research brief.</p>
+          <p>Search QVeris for earnings-call transcript tools, execute them, and turn long transcripts into a source-backed research brief with theme momentum, evidence ledgers, and optional market context.</p>
           <div class="panel">
-            <p>Try <code>POST /run</code> with JSON: <code>{"symbols":["AAPL","NVDA"],"quarters":2}</code></p>
+            <p>Try <code>POST /run</code> with JSON: <code>{"symbols":["AAPL","NVDA"],"quarters":2,"theme_set":"extended","market_context":true}</code></p>
             <p>Try <code>POST /run/markdown</code> for a Markdown report.</p>
           </div>
         </main>
@@ -67,7 +68,8 @@ async def run(req: AnalyzeRequest) -> dict[str, object]:
     report = await EarningsCallSignalAnalyzer().run(
         symbols=req.symbols,
         quarters_per_symbol=req.quarters,
-        themes=_theme_subset(req.themes),
+        themes=_theme_subset(req.themes, req.theme_set),
+        include_market_context=req.market_context,
     )
     if req.write_files:
         report["outputs"] = write_outputs(report, Path("outputs"))
@@ -79,9 +81,9 @@ async def run_markdown(req: AnalyzeRequest) -> str:
     report = await EarningsCallSignalAnalyzer().run(
         symbols=req.symbols,
         quarters_per_symbol=req.quarters,
-        themes=_theme_subset(req.themes),
+        themes=_theme_subset(req.themes, req.theme_set),
+        include_market_context=req.market_context,
     )
     if req.write_files:
         write_outputs(report, Path("outputs"))
     return render_markdown(report)
-

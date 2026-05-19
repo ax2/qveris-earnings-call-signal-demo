@@ -6,7 +6,7 @@ from pathlib import Path
 
 import typer
 
-from .analyzer import DEFAULT_THEMES, EarningsCallSignalAnalyzer, render_markdown, write_outputs
+from .analyzer import EarningsCallSignalAnalyzer, EXTENDED_THEMES, render_markdown, select_themes, write_outputs
 
 app = typer.Typer(add_completion=False, help="Analyze earnings call transcript signals with QVeris.")
 
@@ -15,13 +15,10 @@ def _parse_symbols(value: str) -> list[str]:
     return [item.strip().upper() for item in value.split(",") if item.strip()]
 
 
-def _theme_subset(value: str | None) -> dict[str, list[str]]:
-    if not value:
-        return DEFAULT_THEMES
-    requested = {item.strip() for item in value.split(",") if item.strip()}
-    selected = {name: terms for name, terms in DEFAULT_THEMES.items() if name in requested}
+def _theme_subset(value: str | None, theme_set: str) -> dict[str, list[str]]:
+    selected = select_themes(value, theme_set=theme_set)
     if not selected:
-        raise typer.BadParameter(f"No known themes in {value!r}. Known: {', '.join(DEFAULT_THEMES)}")
+        raise typer.BadParameter(f"No known themes in {value!r}. Known: {', '.join(EXTENDED_THEMES)}")
     return selected
 
 
@@ -29,7 +26,9 @@ def _theme_subset(value: str | None) -> dict[str, list[str]]:
 def run(
     symbols: str = typer.Option("AAPL,NVDA,TSM", help="Comma-separated stock symbols."),
     quarters: int = typer.Option(2, min=1, max=8, help="Recent quarters per symbol."),
+    theme_set: str = typer.Option("extended", help="Theme preset: core or extended."),
     themes: str | None = typer.Option(None, help="Optional theme subset, e.g. AI,Margin,Guidance."),
+    market_context: bool = typer.Option(False, help="Fetch Yahoo Finance post-call price context."),
     output_dir: Path = typer.Option(Path("outputs"), help="Directory for JSON, Markdown, and CSV outputs."),
     markdown: bool = typer.Option(False, help="Print Markdown instead of JSON summary."),
     write_files: bool = typer.Option(True, help="Write report files to output_dir."),
@@ -38,7 +37,8 @@ def run(
         EarningsCallSignalAnalyzer().run(
             symbols=_parse_symbols(symbols),
             quarters_per_symbol=quarters,
-            themes=_theme_subset(themes),
+            themes=_theme_subset(themes, theme_set),
+            include_market_context=market_context,
         )
     )
     paths: dict[str, str] = {}
@@ -66,4 +66,3 @@ def run(
 
 if __name__ == "__main__":
     app()
-
