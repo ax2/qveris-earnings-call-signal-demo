@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import html
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
 from .analyzer import DEFAULT_THEMES, EarningsCallSignalAnalyzer, select_themes, render_markdown, write_outputs
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="QVeris Earnings Call Signal Demo")
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
@@ -54,6 +57,15 @@ def _fmt_number(value: Any) -> str:
     if abs(number) >= 1_000_000_000:
         return f"${number / 1_000_000_000:,.1f}B"
     return f"{number:,.0f}"
+
+
+def _live_run_error(exc: Exception) -> dict[str, str]:
+    message = " ".join(str(exc).split())
+    return {
+        "error": type(exc).__name__,
+        "message": message or "QVeris live run failed without a detailed error message.",
+        "hint": "Check QVERIS_API_KEY, QVERIS_BASE_URL, and outbound network/proxy access from the server.",
+    }
 
 
 def _dashboard_html(report: dict[str, Any]) -> str:
@@ -322,8 +334,23 @@ def _dashboard_html(report: dict[str, Any]) -> str:
                 body: JSON.stringify(payload)
               }});
               if (!response.ok) {{
-                const message = await response.text();
-                throw new Error(message || `HTTP ${{response.status}}`);
+                const contentType = response.headers.get("content-type") || "";
+                let message = `HTTP ${{response.status}}`;
+                if (contentType.includes("application/json")) {{
+                  const payload = await response.json();
+                  const detail = payload.detail || payload;
+                  if (typeof detail === "string") {{
+                    message = detail;
+                  }} else {{
+                    const error = detail.error || "Error";
+                    const reason = detail.message || JSON.stringify(detail);
+                    const hint = detail.hint ? ` Hint: ${{detail.hint}}` : "";
+                    message = `${{error}}: ${{reason}}${{hint}}`;
+                  }}
+                }} else {{
+                  message = await response.text() || message;
+                }}
+                throw new Error(message);
               }}
               const report = await response.json();
               const elapsed = ((performance.now() - started) / 1000).toFixed(1);
@@ -658,14 +685,18 @@ def latest_html_report() -> str:
 
 @app.post("/run")
 async def run(req: AnalyzeRequest) -> dict[str, object]:
-    report = await EarningsCallSignalAnalyzer().run(
-        symbols=req.symbols,
-        quarters_per_symbol=req.quarters,
-        themes=_theme_subset(req.themes, req.theme_set),
-        include_market_context=req.market_context or req.full_context,
-        include_fundamentals_context=req.fundamentals_context or req.full_context,
-        include_news_context=req.news_context or req.full_context,
-    )
+    try:
+        report = await EarningsCallSignalAnalyzer().run(
+            symbols=req.symbols,
+            quarters_per_symbol=req.quarters,
+            themes=_theme_subset(req.themes, req.theme_set),
+            include_market_context=req.market_context or req.full_context,
+            include_fundamentals_context=req.fundamentals_context or req.full_context,
+            include_news_context=req.news_context or req.full_context,
+        )
+    except Exception as exc:
+        logger.exception("QVeris live run failed")
+        raise HTTPException(status_code=502, detail=_live_run_error(exc)) from exc
     if req.write_files:
         report["outputs"] = write_outputs(report, Path("outputs"))
     return report
@@ -673,14 +704,18 @@ async def run(req: AnalyzeRequest) -> dict[str, object]:
 
 @app.post("/run/markdown", response_class=PlainTextResponse)
 async def run_markdown(req: AnalyzeRequest) -> str:
-    report = await EarningsCallSignalAnalyzer().run(
-        symbols=req.symbols,
-        quarters_per_symbol=req.quarters,
-        themes=_theme_subset(req.themes, req.theme_set),
-        include_market_context=req.market_context or req.full_context,
-        include_fundamentals_context=req.fundamentals_context or req.full_context,
-        include_news_context=req.news_context or req.full_context,
-    )
+    try:
+        report = await EarningsCallSignalAnalyzer().run(
+            symbols=req.symbols,
+            quarters_per_symbol=req.quarters,
+            themes=_theme_subset(req.themes, req.theme_set),
+            include_market_context=req.market_context or req.full_context,
+            include_fundamentals_context=req.fundamentals_context or req.full_context,
+            include_news_context=req.news_context or req.full_context,
+        )
+    except Exception as exc:
+        logger.exception("QVeris live markdown run failed")
+        raise HTTPException(status_code=502, detail=_live_run_error(exc)) from exc
     if req.write_files:
         write_outputs(report, Path("outputs"))
     return render_markdown(report)
