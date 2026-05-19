@@ -1,0 +1,5 @@
+symbol,period,date,strongest_theme,strongest_theme_mentions,word_count_estimate,next_return_pct,fifth_return_pct,latest_revenue,latest_gross_margin_pct,latest_operating_margin_pct,latest_roic_pct
+NVDA,FY2026 Q4,2026-02-25,AI,78,8853,-5.456,-6.402,215938000000.0,71.068,60.382,62.88
+NVDA,FY2026 Q3,2025-11-19,AI,94,8906,-3.152,-3.356,215938000000.0,71.068,60.382,62.88
+AAPL,FY2026 Q2,2026-04-30,Margin,20,8945,3.239,5.93,416161000000.0,46.905,31.971,51.97
+AAPL,FY2026 Q1,2026-01-29,AI,21,8384,0.465,6.826,416161000000.0,46.905,31.971,51.97

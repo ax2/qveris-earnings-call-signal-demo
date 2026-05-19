@@ -95,6 +95,16 @@ RISK_WORDS = {
     "downside",
 }
 
+SEMANTIC_BUCKETS: dict[str, list[str]] = {
+    "demand": ["demand", "customer", "orders", "backlog", "adoption", "upgrade", "consumption"],
+    "supply": ["supply", "capacity", "constraint", "inventory", "component", "lead time", "shortage"],
+    "pricing": ["pricing", "price", "asp", "discount", "promotion", "mix"],
+    "margin_cost": ["margin", "cost", "expense", "efficiency", "profitability", "opex", "capex"],
+    "competition": ["competition", "competitor", "share", "competitive", "versus"],
+    "regulation_macro": ["tariff", "regulation", "regulatory", "china", "fx", "macro", "export"],
+    "product_technology": ["product", "platform", "ai", "chip", "software", "model", "infrastructure"],
+}
+
 
 @dataclass(frozen=True)
 class Period:
@@ -168,6 +178,16 @@ def _label_context(text: str) -> str:
     if opportunity_hits > risk_hits:
         return "opportunity"
     return "neutral"
+
+
+def _semantic_bucket(text: str) -> str:
+    lower = text.lower()
+    scores = {
+        bucket: sum(1 for term in terms if re.search(rf"\b{re.escape(term)}\b", lower))
+        for bucket, terms in SEMANTIC_BUCKETS.items()
+    }
+    bucket, score = max(scores.items(), key=lambda item: item[1])
+    return bucket if score > 0 else "general"
 
 
 def _speaker_role(name: str | None, snippet: str) -> str:
@@ -268,6 +288,7 @@ def analyze_transcript(
             snippet = _sentence_window(content, match.start(), match.end())
             speaker = _speaker_before(content, match.start()) or "Unknown"
             label = _label_context(snippet)
+            semantic_bucket = _semantic_bucket(snippet)
             context = _source_context(
                 content=content,
                 start=match.start(),
@@ -290,6 +311,7 @@ def analyze_transcript(
                 "transcript_segment": context["transcript_segment"],
                 "source_context": context["source_context"],
                 "label": label,
+                "semantic_bucket": semantic_bucket,
                 "snippet": snippet,
             }
             evidence.append(row)
@@ -352,13 +374,16 @@ class EarningsCallSignalAnalyzer:
         search_id: str,
         limit: int,
     ) -> tuple[list[Period], dict[str, Any]]:
-        execution = await self.client.execute(
-            DATES_TOOL_ID,
-            search_id=search_id,
-            parameters={"symbol": symbol},
-            session_id=self.session_id,
-            max_response_size=120000,
-        )
+        try:
+            execution = await self.client.execute(
+                DATES_TOOL_ID,
+                search_id=search_id,
+                parameters={"symbol": symbol},
+                session_id=self.session_id,
+                max_response_size=120000,
+            )
+        except Exception as exc:
+            return [], _error_execute_meta(type(exc).__name__, str(exc))
         periods: list[Period] = []
         for row in _as_list(_result_data(execution)):
             if not isinstance(row, dict):
@@ -382,17 +407,20 @@ class EarningsCallSignalAnalyzer:
         period: Period,
         search_id: str,
     ) -> tuple[str, dict[str, Any]]:
-        execution = await self.client.execute(
-            TRANSCRIPT_TOOL_ID,
-            search_id=search_id,
-            parameters={
-                "symbol": period.symbol,
-                "year": str(period.year),
-                "quarter": str(period.quarter),
-            },
-            session_id=self.session_id,
-            max_response_size=120000,
-        )
+        try:
+            execution = await self.client.execute(
+                TRANSCRIPT_TOOL_ID,
+                search_id=search_id,
+                parameters={
+                    "symbol": period.symbol,
+                    "year": str(period.year),
+                    "quarter": str(period.quarter),
+                },
+                session_id=self.session_id,
+                max_response_size=120000,
+            )
+        except Exception as exc:
+            return "", _error_execute_meta(type(exc).__name__, str(exc))
         for row in _as_list(_result_data(execution)):
             if isinstance(row, dict) and isinstance(row.get("content"), str):
                 return row["content"], execution
@@ -405,6 +433,8 @@ class EarningsCallSignalAnalyzer:
         quarters_per_symbol: int = 2,
         themes: dict[str, list[str]] | None = None,
         include_market_context: bool = False,
+        include_fundamentals_context: bool = False,
+        include_news_context: bool = False,
     ) -> dict[str, Any]:
         started = time.monotonic()
         clean_symbols = [symbol.strip().upper() for symbol in symbols if symbol.strip()]
@@ -449,7 +479,7 @@ class EarningsCallSignalAnalyzer:
         for period, (content, execution) in zip(selected_periods, transcript_results, strict=True):
             transcript_execs.append({"period": period.__dict__, **_compact_execute_meta(execution)})
             if not content:
-                missing.append(period.__dict__)
+                missing.append({**period.__dict__, "error": execution.get("error")})
                 continue
             analyses.append(analyze_transcript(period=period, content=content, themes=theme_map))
 
@@ -463,6 +493,26 @@ class EarningsCallSignalAnalyzer:
                 client=self.client,
                 session_id=self.session_id,
             )
+        fundamentals_context: list[dict[str, Any]] = []
+        if include_fundamentals_context:
+            from .fundamentals import fetch_fundamentals_context
+
+            fundamentals_context = await fetch_fundamentals_context(
+                clean_symbols,
+                client=self.client,
+                session_id=self.session_id,
+            )
+        news_context: list[dict[str, Any]] = []
+        news_summary: dict[str, Any] = {}
+        if include_news_context:
+            from .news import build_news_summary, fetch_news_context
+
+            news_context = await fetch_news_context(
+                clean_symbols,
+                client=self.client,
+                session_id=self.session_id,
+            )
+            news_summary = build_news_summary(news_context)
         return {
             "demo": "qveris-earnings-call-signal-demo",
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -487,8 +537,25 @@ class EarningsCallSignalAnalyzer:
             "analyses": analyses,
             "portfolio_view": portfolio_view,
             "market_context": market_context,
-            "research_brief": build_research_brief(analyses, portfolio_view, market_context),
-            "llm_review_pack": build_llm_review_pack(analyses, portfolio_view, market_context),
+            "fundamentals_context": fundamentals_context,
+            "news_context": news_context,
+            "news_summary": news_summary,
+            "research_timeline": build_research_timeline(analyses, market_context, fundamentals_context),
+            "theme_timeseries": build_theme_timeseries(analyses),
+            "research_brief": build_research_brief(
+                analyses,
+                portfolio_view,
+                market_context,
+                fundamentals_context,
+                news_summary,
+            ),
+            "llm_review_pack": build_llm_review_pack(
+                analyses,
+                portfolio_view,
+                market_context,
+                fundamentals_context,
+                news_summary,
+            ),
         }
 
 
@@ -499,9 +566,19 @@ def _compact_execute_meta(execution: dict[str, Any]) -> dict[str, Any]:
         "execution_id": execution.get("execution_id"),
         "success": execution.get("success"),
         "cost": execution.get("cost"),
+        "error": execution.get("error"),
         "billing_summary": billing.get("summary") if isinstance(billing, dict) else None,
         "outcome": outcome.get("outcome") if isinstance(outcome, dict) else None,
         "valid_result_count": outcome.get("valid_result_count") if isinstance(outcome, dict) else None,
+    }
+
+
+def _error_execute_meta(error_type: str, message: str) -> dict[str, Any]:
+    return {
+        "execution_id": None,
+        "success": False,
+        "cost": None,
+        "error": f"{error_type}: {' '.join(message.split())}",
     }
 
 
@@ -600,10 +677,105 @@ def build_theme_momentum(timeline: dict[str, list[dict[str, Any]]]) -> list[dict
     return sorted(out, key=lambda item: abs(float(item["delta_per_1k"])), reverse=True)
 
 
+def build_research_timeline(
+    analyses: list[dict[str, Any]],
+    market_context: list[dict[str, Any]] | None = None,
+    fundamentals_context: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    market_by_symbol_date = {
+        (row.get("symbol"), row.get("event_date")): row for row in market_context or []
+    }
+    fundamentals_by_symbol = _latest_fundamentals_by_symbol(fundamentals_context or [])
+    rows: list[dict[str, Any]] = []
+    for analysis in analyses:
+        themes = analysis.get("themes") or {}
+        strongest_theme = "-"
+        strongest_count = 0
+        if themes:
+            strongest_theme, strongest_payload = max(
+                themes.items(),
+                key=lambda item: int((item[1] or {}).get("mentions") or 0),
+            )
+            strongest_count = int((strongest_payload or {}).get("mentions") or 0)
+        market = market_by_symbol_date.get((analysis.get("symbol"), analysis.get("date"))) or {}
+        fundamentals = fundamentals_by_symbol.get(str(analysis.get("symbol"))) or {}
+        rows.append(
+            {
+                "symbol": analysis.get("symbol"),
+                "period": analysis.get("period"),
+                "date": analysis.get("date"),
+                "strongest_theme": strongest_theme,
+                "strongest_theme_mentions": strongest_count,
+                "word_count_estimate": analysis.get("word_count_estimate"),
+                "next_return_pct": market.get("next_return_pct"),
+                "fifth_return_pct": market.get("fifth_return_pct"),
+                "latest_revenue": fundamentals.get("revenue"),
+                "latest_gross_margin_pct": fundamentals.get("gross_margin_pct"),
+                "latest_operating_margin_pct": fundamentals.get("operating_margin_pct"),
+                "latest_roic_pct": fundamentals.get("return_on_invested_capital_pct"),
+            }
+        )
+    return sorted(rows, key=lambda row: (str(row.get("symbol")), str(row.get("date"))), reverse=True)
+
+
+def build_theme_timeseries(analyses: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for analysis in analyses:
+        evidence_by_theme: dict[str, Counter[str]] = defaultdict(Counter)
+        for evidence in analysis.get("evidence") or []:
+            theme = str(evidence.get("theme") or "")
+            bucket = str(evidence.get("semantic_bucket") or "general")
+            if theme:
+                evidence_by_theme[theme][bucket] += 1
+
+        for theme, payload in (analysis.get("themes") or {}).items():
+            label_counts = payload.get("labels") or {}
+            source_counts = payload.get("source_contexts") or {}
+            semantic_counts = evidence_by_theme.get(str(theme)) or Counter()
+            top_bucket = semantic_counts.most_common(1)[0][0] if semantic_counts else "general"
+            rows.append(
+                {
+                    "symbol": analysis.get("symbol"),
+                    "period": analysis.get("period"),
+                    "date": analysis.get("date"),
+                    "theme": theme,
+                    "mentions": payload.get("mentions", 0),
+                    "mentions_per_1k_words": payload.get("mentions_per_1k_words", 0),
+                    "opportunity_mentions": label_counts.get("opportunity", 0),
+                    "risk_mentions": label_counts.get("risk", 0),
+                    "neutral_mentions": label_counts.get("neutral", 0),
+                    "management_active_mentions": source_counts.get("management_active", 0),
+                    "analyst_prompted_mentions": source_counts.get("analyst_prompted", 0),
+                    "management_response_mentions": source_counts.get("management_response_to_question", 0),
+                    "top_semantic_bucket": top_bucket,
+                }
+            )
+    return sorted(
+        rows,
+        key=lambda row: (
+            str(row.get("symbol")),
+            str(row.get("theme")),
+            str(row.get("date")),
+        ),
+        reverse=True,
+    )
+
+
+def _latest_fundamentals_by_symbol(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for row in sorted(rows, key=lambda item: str(item.get("fiscal_year") or ""), reverse=True):
+        symbol = str(row.get("symbol") or "")
+        if symbol and row.get("status") != "unavailable" and symbol not in out:
+            out[symbol] = row
+    return out
+
+
 def build_research_brief(
     analyses: list[dict[str, Any]],
     portfolio_view: dict[str, Any],
     market_context: list[dict[str, Any]] | None = None,
+    fundamentals_context: list[dict[str, Any]] | None = None,
+    news_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     totals = portfolio_view.get("theme_totals") or {}
     labels = portfolio_view.get("theme_labels") or {}
@@ -611,6 +783,8 @@ def build_research_brief(
     leaders = portfolio_view.get("theme_leaders") or {}
     momentum = portfolio_view.get("theme_momentum") or []
     market_context = market_context or []
+    fundamentals_context = fundamentals_context or []
+    news_summary = news_summary or {}
 
     top_themes = list(totals.keys())[:5]
     opportunity_themes = sorted(
@@ -653,6 +827,18 @@ def build_research_brief(
                 f"{row['symbol']} 在 {row['event_date']} 电话会后的下一交易日涨跌为 "
                 f"{row['next_return_pct']}%，建议把价格反应与逐字稿主题变化并读。"
             )
+    for row in _latest_fundamentals_by_symbol(fundamentals_context).values():
+        if row.get("gross_margin_pct") is not None and row.get("operating_margin_pct") is not None:
+            questions.append(
+                f"{row['symbol']} 最近财年毛利率 {row['gross_margin_pct']}%、经营利润率 "
+                f"{row['operating_margin_pct']}%，建议与 Margin / Pricing 主题一起复核。"
+            )
+    for symbol, titles in (news_summary.get("latest_titles_by_symbol") or {}).items():
+        if titles:
+            topics = titles[0].get("topics") or "General"
+            questions.append(
+                f"{symbol} 最新新闻主题包含 {topics}，建议检查这些外部叙事是否与电话会主题一致。"
+            )
 
     return {
         "headline": _brief_headline(totals, leaders),
@@ -675,7 +861,7 @@ def build_research_brief(
             }
             for theme, counts in source_contexts.items()
         },
-        "diligence_questions": questions[:8],
+        "diligence_questions": questions[:12],
         "coverage": {
             "transcripts": len(analyses),
             "symbols": sorted({str(row.get("symbol")) for row in analyses}),
@@ -695,6 +881,8 @@ def build_llm_review_pack(
     analyses: list[dict[str, Any]],
     portfolio_view: dict[str, Any],
     market_context: list[dict[str, Any]] | None = None,
+    fundamentals_context: list[dict[str, Any]] | None = None,
+    news_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     evidence = sorted(
         [
@@ -721,9 +909,11 @@ def build_llm_review_pack(
         ],
         "portfolio_view": portfolio_view,
         "market_context": market_context or [],
+        "fundamentals_context": fundamentals_context or [],
+        "news_summary": news_summary or {},
         "evidence": evidence,
         "prompt": (
-            "Based on the portfolio_view, market_context, and evidence rows, draft a concise "
+            "Based on the portfolio_view, market_context, fundamentals_context, news_summary, and evidence rows, draft a concise "
             "earnings-call review memo. Group observations by theme, flag whether each point "
             "came from prepared remarks, analyst questions, or management responses, and list "
             "follow-up questions for human review."
@@ -803,6 +993,20 @@ def render_markdown(report: dict[str, Any]) -> str:
         )
     lines.append("")
 
+    theme_timeseries = report.get("theme_timeseries") or []
+    if theme_timeseries:
+        lines.append("## Theme Timeseries")
+        lines.append("")
+        lines.append("| Symbol | Period | Theme | Mentions / 1k words | Opportunity | Risk | Top semantic bucket |")
+        lines.append("|---|---|---|---:|---:|---:|---|")
+        for item in theme_timeseries[:16]:
+            lines.append(
+                f"| {item.get('symbol')} | {item.get('period')} | {item.get('theme')} | "
+                f"{item.get('mentions_per_1k_words')} | {item.get('opportunity_mentions')} | "
+                f"{item.get('risk_mentions')} | {item.get('top_semantic_bucket')} |"
+            )
+        lines.append("")
+
     lines.append("## Period Summaries")
     lines.append("")
     report_themes = list((report.get("themes") or {}).keys())
@@ -840,6 +1044,53 @@ def render_markdown(report: dict[str, Any]) -> str:
             lines.append("")
             lines.append(
                 "Some market context rows are unavailable; check `market_context.csv` for status and error details."
+            )
+        lines.append("")
+
+    fundamentals_context = report.get("fundamentals_context") or []
+    if fundamentals_context:
+        lines.append("## Fundamentals Context")
+        lines.append("")
+        lines.append("| Symbol | Fiscal year | Revenue | Gross margin | Operating margin | ROIC | Capex / revenue |")
+        lines.append("|---|---:|---:|---:|---:|---:|---:|")
+        for row in fundamentals_context:
+            if row.get("status") == "unavailable":
+                lines.append(f"| {row.get('symbol')} | - | - | - | - | - | - |")
+                continue
+            lines.append(
+                f"| {row.get('symbol')} | {row.get('fiscal_year')} | {row.get('revenue')} | "
+                f"{row.get('gross_margin_pct')}% | {row.get('operating_margin_pct')}% | "
+                f"{row.get('return_on_invested_capital_pct')}% | {row.get('capex_to_revenue_pct')}% |"
+            )
+        lines.append("")
+
+    news_summary = report.get("news_summary") or {}
+    latest_titles = news_summary.get("latest_titles_by_symbol") or {}
+    if latest_titles:
+        lines.append("## News Context")
+        lines.append("")
+        for symbol, titles in latest_titles.items():
+            lines.append(f"### {symbol}")
+            for item in titles[:3]:
+                lines.append(
+                    f"- [{item.get('topics')}] {item.get('published_at')} · "
+                    f"{item.get('publisher')}: {item.get('title')}"
+                )
+            lines.append("")
+
+    research_timeline = report.get("research_timeline") or []
+    if research_timeline:
+        lines.append("## Research Timeline")
+        lines.append("")
+        lines.append(
+            "| Symbol | Period | Strongest theme | Mentions | Next return | Latest gross margin | Latest operating margin |"
+        )
+        lines.append("|---|---|---|---:|---:|---:|---:|")
+        for row in research_timeline:
+            lines.append(
+                f"| {row.get('symbol')} | {row.get('period')} | {row.get('strongest_theme')} | "
+                f"{row.get('strongest_theme_mentions')} | {row.get('next_return_pct')}% | "
+                f"{row.get('latest_gross_margin_pct')}% | {row.get('latest_operating_margin_pct')}% |"
             )
         lines.append("")
 
@@ -884,6 +1135,12 @@ def write_outputs(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
     matrix_path = output_dir / "theme_matrix.csv"
     evidence_path = output_dir / "evidence_ledger.csv"
     market_path = output_dir / "market_context.csv"
+    fundamentals_path = output_dir / "fundamentals_context.csv"
+    news_path = output_dir / "news_context.csv"
+    timeline_path = output_dir / "research_timeline.csv"
+    timeseries_path = output_dir / "theme_timeseries.csv"
+    semantic_path = output_dir / "semantic_breakdown.csv"
+    annotation_path = output_dir / "annotation_template.csv"
     llm_pack_path = output_dir / "llm_review_pack.json"
 
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -891,6 +1148,12 @@ def write_outputs(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
     _write_theme_matrix(report, matrix_path)
     _write_evidence_ledger(report, evidence_path)
     _write_market_context(report, market_path)
+    _write_fundamentals_context(report, fundamentals_path)
+    _write_news_context(report, news_path)
+    _write_research_timeline(report, timeline_path)
+    _write_theme_timeseries(report, timeseries_path)
+    _write_semantic_breakdown(report, semantic_path)
+    _write_annotation_template(report, annotation_path)
     llm_pack_path.write_text(
         json.dumps(report.get("llm_review_pack") or {}, ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -902,6 +1165,12 @@ def write_outputs(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
         "theme_matrix": str(matrix_path),
         "evidence_ledger": str(evidence_path),
         "market_context": str(market_path),
+        "fundamentals_context": str(fundamentals_path),
+        "news_context": str(news_path),
+        "research_timeline": str(timeline_path),
+        "theme_timeseries": str(timeseries_path),
+        "semantic_breakdown": str(semantic_path),
+        "annotation_template": str(annotation_path),
         "llm_review_pack": str(llm_pack_path),
     }
 
@@ -920,6 +1189,7 @@ def _write_theme_matrix(report: dict[str, Any], path: Path) -> None:
                 *themes,
                 *[f"{theme}_per_1k_words" for theme in themes],
             ],
+            lineterminator="\n",
         )
         writer.writeheader()
         for row in report.get("analyses") or []:
@@ -950,14 +1220,154 @@ def _write_evidence_ledger(report: dict[str, Any], path: Path) -> None:
         "speaker_role",
         "transcript_segment",
         "source_context",
+        "semantic_bucket",
         "snippet",
     ]
     with path.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         for row in report.get("analyses") or []:
             for evidence in row.get("evidence") or []:
                 writer.writerow({field: evidence.get(field) for field in fieldnames})
+
+
+def _write_fundamentals_context(report: dict[str, Any], path: Path) -> None:
+    fieldnames = [
+        "symbol",
+        "fiscal_year",
+        "period",
+        "date",
+        "status",
+        "revenue",
+        "gross_margin_pct",
+        "operating_margin_pct",
+        "net_margin_pct",
+        "return_on_invested_capital_pct",
+        "capex_to_revenue_pct",
+        "free_cash_flow_yield_pct",
+        "market_cap",
+        "metrics_execution_id",
+        "income_execution_id",
+        "metrics_cost",
+        "income_cost",
+        "error",
+    ]
+    _write_dict_rows(report.get("fundamentals_context") or [], path, fieldnames)
+
+
+def _write_news_context(report: dict[str, Any], path: Path) -> None:
+    fieldnames = [
+        "symbol",
+        "published_at",
+        "publisher",
+        "title",
+        "news_topics",
+        "url",
+        "execution_id",
+        "cost",
+        "status",
+        "error",
+    ]
+    _write_dict_rows(report.get("news_context") or [], path, fieldnames)
+
+
+def _write_research_timeline(report: dict[str, Any], path: Path) -> None:
+    fieldnames = [
+        "symbol",
+        "period",
+        "date",
+        "strongest_theme",
+        "strongest_theme_mentions",
+        "word_count_estimate",
+        "next_return_pct",
+        "fifth_return_pct",
+        "latest_revenue",
+        "latest_gross_margin_pct",
+        "latest_operating_margin_pct",
+        "latest_roic_pct",
+    ]
+    _write_dict_rows(report.get("research_timeline") or [], path, fieldnames)
+
+
+def _write_theme_timeseries(report: dict[str, Any], path: Path) -> None:
+    fieldnames = [
+        "symbol",
+        "period",
+        "date",
+        "theme",
+        "mentions",
+        "mentions_per_1k_words",
+        "opportunity_mentions",
+        "risk_mentions",
+        "neutral_mentions",
+        "management_active_mentions",
+        "analyst_prompted_mentions",
+        "management_response_mentions",
+        "top_semantic_bucket",
+    ]
+    _write_dict_rows(report.get("theme_timeseries") or [], path, fieldnames)
+
+
+def _write_semantic_breakdown(report: dict[str, Any], path: Path) -> None:
+    counts: Counter[tuple[str, str, str]] = Counter()
+    for row in report.get("analyses") or []:
+        for evidence in row.get("evidence") or []:
+            counts[(evidence.get("symbol"), evidence.get("theme"), evidence.get("semantic_bucket"))] += 1
+    rows = [
+        {"symbol": symbol, "theme": theme, "semantic_bucket": bucket, "mentions": count}
+        for (symbol, theme, bucket), count in counts.most_common()
+    ]
+    _write_dict_rows(rows, path, ["symbol", "theme", "semantic_bucket", "mentions"])
+
+
+def _write_annotation_template(report: dict[str, Any], path: Path) -> None:
+    rows: list[dict[str, Any]] = []
+    for analysis in report.get("analyses") or []:
+        for idx, evidence in enumerate(analysis.get("evidence") or []):
+            if idx % 8 != 0 and evidence.get("label") == "neutral":
+                continue
+            rows.append(
+                {
+                    "symbol": evidence.get("symbol"),
+                    "period": evidence.get("period"),
+                    "theme": evidence.get("theme"),
+                    "auto_label": evidence.get("label"),
+                    "auto_semantic_bucket": evidence.get("semantic_bucket"),
+                    "source_context": evidence.get("source_context"),
+                    "snippet": evidence.get("snippet"),
+                    "human_label": "",
+                    "human_semantic_bucket": "",
+                    "review_notes": "",
+                }
+            )
+            if len(rows) >= 80:
+                break
+        if len(rows) >= 80:
+            break
+    _write_dict_rows(
+        rows,
+        path,
+        [
+            "symbol",
+            "period",
+            "theme",
+            "auto_label",
+            "auto_semantic_bucket",
+            "source_context",
+            "snippet",
+            "human_label",
+            "human_semantic_bucket",
+            "review_notes",
+        ],
+    )
+
+
+def _write_dict_rows(rows: list[dict[str, Any]], path: Path, fieldnames: list[str]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames, lineterminator="\n")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({field: row.get(field) for field in fieldnames})
 
 
 def _write_market_context(report: dict[str, Any], path: Path) -> None:
@@ -981,7 +1391,7 @@ def _write_market_context(report: dict[str, Any], path: Path) -> None:
         "fifth_return_pct",
     ]
     with path.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         for row in report.get("market_context") or []:
             writer.writerow({field: row.get(field) for field in fieldnames})

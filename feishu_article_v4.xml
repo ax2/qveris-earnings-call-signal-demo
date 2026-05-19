@@ -1,0 +1,156 @@
+<title>用 QVeris 把财报电话会逐字稿变成可追溯的投研线索</title>
+
+<p>这是一篇第三方实践记录。示例程序已经继续扩展到 full-context 版本：除了财报电话会逐字稿，也把电话会后的市场表现、基础财务指标、新闻上下文、语义分类、人工标注模板和 LLM 复核包放进同一条工作流。</p>
+
+<callout emoji="📝" background-color="light-blue" border-color="blue">
+  <p>核心目标没有变：不是自动给投资建议，而是把多家公司、多季度电话会里的主题变化整理成可复核的研究线索，并保留每一条信号背后的原文证据和数据调用记录。</p>
+</callout>
+
+<img src="Uj4fbgEECoDpz5xLAMdcTNv9noc" width="1200" height="750" caption="封面：把闲散的财报电话会文本转成结构化投研线索" name="cover_earnings_call_signal.png"/>
+
+<h1>一、从一个真实问题开始</h1>
+
+<p>财报电话会逐字稿很适合做投研 Agent 的基础数据源。它比新闻更接近公司一线表达，比财报表格更容易反映管理层对业务、风险和未来预期的叙述方式。</p>
+
+<p>但逐字稿也有明显问题：单份 transcript 往往有几万字，多家公司、多季度一起看时，人工阅读成本很高。如果只是让模型“总结一下”，又容易丢掉证据来源，最后很难复核。</p>
+
+<grid>
+  <column width-ratio="0.33">
+    <h2>传统做法</h2>
+    <p>先找接口、写脚本、拉数据，再人工整理重点。</p>
+  </column>
+  <column width-ratio="0.33">
+    <h2>主要瓶颈</h2>
+    <p>工具发现、参数填充、跨公司对比、证据回溯都需要重复劳动。</p>
+  </column>
+  <column width-ratio="0.34">
+    <h2>这次尝试</h2>
+    <p>用 QVeris 完成工具发现和执行，把分析逻辑集中在投研问题本身。</p>
+  </column>
+</grid>
+
+<h1>二、示例程序现在做了什么</h1>
+
+<p>程序名称是 <code>QVeris Earnings Call Signal Demo</code>。它的输入很简单：股票代码、最近几个季度、关注主题。新版运行方式使用 <code>--full-context</code>，会一次性拉取逐字稿、市场上下文、基础面数据和新闻上下文。</p>
+
+<img src="L3ombWjfwoYkVNxtQe5cQXhnnmg" width="1200" height="750" caption="程序运行总览：主题强度、证据数量、输出文件和后续问题" name="screenshot_dashboard_overview.png"/>
+
+<table>
+  <thead>
+    <tr><th background-color="light-gray">输出</th><th background-color="light-gray">用途</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Markdown / JSON 报告</td><td>快速阅读结论，同时保留完整结构化结果。</td></tr>
+    <tr><td>theme_matrix.csv</td><td>比较不同公司和季度的主题频率。</td></tr>
+    <tr><td>theme_timeseries.csv</td><td>按公司、季度、主题展开长期序列，适合继续做趋势图。</td></tr>
+    <tr><td>evidence_ledger.csv</td><td>保留每个主题命中的原文片段、说话人、来源语境和语义桶。</td></tr>
+    <tr><td>market_context.csv</td><td>记录电话会后的下一交易日和 5 个交易日市场表现。</td></tr>
+    <tr><td>fundamentals_context.csv</td><td>记录收入、毛利率、经营利润率、ROIC、Capex / Revenue 等基础面指标。</td></tr>
+    <tr><td>news_context.csv</td><td>把最新新闻标题按 AI、Product、Financials、Competition、Regulation 等主题归类。</td></tr>
+    <tr><td>research_timeline.csv</td><td>把电话会主题、市场反应和最新基础面指标放到一张表里。</td></tr>
+    <tr><td>semantic_breakdown.csv</td><td>把证据拆成 demand、supply、pricing、margin_cost、competition 等语义桶。</td></tr>
+    <tr><td>annotation_template.csv</td><td>抽样证据行，预留人工标注列，后续可形成评估样本。</td></tr>
+    <tr><td>llm_review_pack.json</td><td>给 LLM 或人工复核使用，包含 guardrails、上下文和证据样本。</td></tr>
+  </tbody>
+</table>
+
+<h1>三、一次真实运行</h1>
+
+<p>我用 AAPL 和 NVDA 各取最近两个季度，跑出了 4 份逐字稿。新版完整运行约 12 秒，生成了 381 条证据片段和 12 个输出文件。</p>
+
+<table>
+  <thead>
+    <tr><th background-color="light-gray">公司</th><th background-color="light-gray">期间</th><th background-color="light-gray">日期</th><th background-color="light-gray">最强主题</th><th background-color="light-gray">电话会后下一交易日</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>AAPL</td><td>FY2026 Q2</td><td>2026-04-30</td><td>Margin</td><td>3.239%</td></tr>
+    <tr><td>AAPL</td><td>FY2026 Q1</td><td>2026-01-29</td><td>AI</td><td>0.465%</td></tr>
+    <tr><td>NVDA</td><td>FY2026 Q4</td><td>2026-02-25</td><td>AI</td><td>-5.456%</td></tr>
+    <tr><td>NVDA</td><td>FY2026 Q3</td><td>2025-11-19</td><td>AI</td><td>-3.152%</td></tr>
+  </tbody>
+</table>
+
+<p>主题结果里，AI 是最强信号，共 210 次提及，由 NVDA 领先；SupplyChain、Margin、Pricing、Guidance 也形成了可比较的主题矩阵。这里的数字不是结论，而是下一步阅读原文的索引。</p>
+
+<h1>四、把电话会放进更完整的上下文</h1>
+
+<p>只看逐字稿容易忽略外部背景。新版程序通过 QVeris 继续调用基础面和新闻类工具，把最近财年的收入、毛利率、经营利润率、ROIC，以及最新新闻主题放到同一份结果里。</p>
+
+<img src="Gf2Eb8ihdomRLRx7vBHcv9Fkn1c" width="1200" height="750" caption="上下文矩阵：基础面指标和最新新闻主题" name="screenshot_context_matrix.png"/>
+
+<p>这样做的价值在于：当某个主题升温或降温时，分析师可以同时看到基础面指标和外部新闻叙事。例如 Margin / Pricing 主题可以和毛利率、经营利润率一起看，AI / Product 主题可以和近期新闻标题一起看。</p>
+
+<h1>五、研究时间线：把主题、市场和基础面并起来</h1>
+
+<p><code>research_timeline.csv</code> 是这次新增的关键产物。它按电话会逐行整理最强主题、提及次数、电话会后的市场表现，以及最新基础面指标，适合做第一轮筛选。</p>
+
+<img src="Wd5ibKE9io31gzxZYwAcQpaqnSf" width="1200" height="750" caption="研究时间线：主题变化、市场反应和基础面指标" name="screenshot_research_timeline.png"/>
+
+<p>同时，<code>theme_timeseries.csv</code> 会按公司、季度、主题输出 <code>mentions_per_1k_words</code>、机会/风险语境、管理层主动叙述/分析师追问等字段。后续如果继续扩展，可以直接把它做成长期趋势图。</p>
+
+<h1>六、证据台账、语义分类和人工标注</h1>
+
+<p>投研分析里最怕的是“看起来像结论，但不知道从哪里来的结论”。这个 demo 会生成 <code>evidence_ledger.csv</code>，每一行都包含公司、季度、命中主题、关键词、说话人、prepared remarks / Q&amp;A 分段、管理层主动叙述 / 分析师追问 / 管理层回答等来源分类，以及原文片段。</p>
+
+<p>新版还增加了轻量语义桶，例如 demand、supply、pricing、margin_cost、competition、regulation_macro、product_technology。这不是最终模型，只是一个可解释的起点：先让证据变得可分组，再通过人工标注逐步改进。</p>
+
+<img src="LOWBbhwMTovVD1xPcg3cFWMSntf" width="1200" height="750" caption="语义分类与人工标注模板" name="screenshot_semantic_annotation.png"/>
+
+<callout emoji="📌" background-color="light-yellow" border-color="yellow">
+  <p>真正有价值的不是把逐字稿总结成几段话，而是把数据发现、调用、对比、证据留存和人工复核这一整条链路跑通。</p>
+</callout>
+
+<h1>七、通过 QVeris 获取市场上下文</h1>
+
+<p>程序不直接调用外部 chart 接口，而是通过 QVeris 搜索并调用市场数据工具获取历史 EOD 价格。当前使用的工具是：</p>
+
+<pre lang="text"><code>financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211</code></pre>
+
+<img src="Mrevbjy4qoq5z4xEQ2QcWphSn8b" width="1200" height="750" caption="QVeris 市场上下文：电话会后下一交易日和 5 个交易日表现" name="screenshot_market_context_qveris.png"/>
+
+<p>这一步的意义不是用股价反应证明电话会内容，而是给分析师一个背景：哪些电话会后的市场反应值得和主题变化放在一起看。程序会把 <code>execution_id</code>、<code>cost</code>、<code>market_tool_id</code> 一起写入 CSV，方便追溯。</p>
+
+<h1>八、LLM 复核包</h1>
+
+<p>为了避免 LLM 生成没有出处的结论，程序额外导出 <code>llm_review_pack.json</code>。这个文件包含 guardrails、主题视图、市场上下文、基础面上下文、新闻摘要、证据样本和一个面向复核 memo 的 prompt。</p>
+
+<img src="AOA3bJYlSozAcoxrpOZckXIpnnc" width="1200" height="750" caption="LLM 复核包：guardrails、上下文和证据样本" name="screenshot_llm_review_pack.png"/>
+
+<p>它的定位不是让模型直接给投资建议，而是让模型基于证据生成复核问题，帮助人更快进入“该回看哪段原文”的状态。</p>
+
+<h1>九、实现上的一个小改进：外部调用要能降级</h1>
+
+<p>这次完整运行时，逐字稿接口曾出现过一次 <code>ReadTimeout</code>。程序因此补了一个实用改动：日期和逐字稿调用如果单次失败，不再让整个分析崩掉，而是把失败记录进 <code>missing_transcripts</code> 和执行元数据里，其他公司、其他季度仍然可以继续产出结果。</p>
+
+<p>这类 demo 如果要变成可长期运行的工具，外部接口超时、空结果、部分失败都应该是正常分支，而不是异常终点。</p>
+
+<h1>十、运行方式</h1>
+
+<pre lang="bash"><code>uv sync
+cp .env.example .env
+uv run earnings-signal \
+  --symbols AAPL,NVDA,TSM \
+  --quarters 2 \
+  --theme-set extended \
+  --themes AI,Margin,Guidance,SupplyChain,Pricing,Competition \
+  --full-context</code></pre>
+
+<p>代码地址：</p>
+
+<bookmark name="代码仓库：qveris-earnings-call-signal-demo" href="https://github.com/ax2/qveris-earnings-call-signal-demo"></bookmark>
+
+<p>代码已经补充 <code>LICENSE</code> 文件，使用 MIT License。</p>
+
+<h1>十一、后续还可以继续做什么</h1>
+
+<ul>
+  <li>把 <code>theme_timeseries.csv</code> 接到图表页面，形成按公司和主题筛选的长期趋势视图。</li>
+  <li>把规则语义桶替换成可评估的小模型分类，但仍保留 evidence ledger 作为可追溯基础。</li>
+  <li>基于 <code>annotation_template.csv</code> 做人工标注，统计规则分类与人工分类的差异。</li>
+  <li>把新闻事件、基本面变化和电话会主题变化做成更明确的事件时间线。</li>
+  <li>增加更多数据源，但每个新增数据源都记录调用工具、参数、execution_id 和 cost。</li>
+</ul>
+
+<hr/>
+
+<p>本文只是一次可复现的小实验，不构成任何投资建议。对外使用时，还需要结合数据源条款、公司公告和人工判断。</p>

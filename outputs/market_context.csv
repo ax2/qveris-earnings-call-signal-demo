@@ -1,5 +1,5 @@
 symbol,event_date,status,error,price_source,market_tool_id,execution_id,success,cost,base_trading_date,base_close,next_trading_date,next_close,next_return_pct,fifth_trading_date,fifth_close,fifth_return_pct
-NVDA,2026-02-25,ok,,QVeris,financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211,576edda5-3b19-42f8-8ce3-43b9c15133b4,True,1.15,2026-02-25,195.56,2026-02-26,184.89,-5.456,2026-03-04,183.04,-6.402
-NVDA,2025-11-19,ok,,QVeris,financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211,576edda5-3b19-42f8-8ce3-43b9c15133b4,True,1.15,2025-11-19,186.52,2025-11-20,180.64,-3.152,2025-11-26,180.26,-3.356
-AAPL,2026-04-30,ok,,QVeris,financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211,d39a5742-f457-463d-b6f3-878230e009d8,True,1.15,2026-04-30,271.35,2026-05-01,280.14,3.239,2026-05-07,287.44,5.93
-AAPL,2026-01-29,ok,,QVeris,financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211,d39a5742-f457-463d-b6f3-878230e009d8,True,1.15,2026-01-29,258.28,2026-01-30,259.48,0.465,2026-02-05,275.91,6.826
+NVDA,2026-02-25,ok,,QVeris,financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211,f7975538-5c80-435c-8fd5-e8bff419392e,True,1.15,2026-02-25,195.56,2026-02-26,184.89,-5.456,2026-03-04,183.04,-6.402
+NVDA,2025-11-19,ok,,QVeris,financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211,f7975538-5c80-435c-8fd5-e8bff419392e,True,1.15,2025-11-19,186.52,2025-11-20,180.64,-3.152,2025-11-26,180.26,-3.356
+AAPL,2026-04-30,ok,,QVeris,financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211,4f389115-fc98-4ae4-9188-e0f445139c9a,True,1.15,2026-04-30,271.35,2026-05-01,280.14,3.239,2026-05-07,287.44,5.93
+AAPL,2026-01-29,ok,,QVeris,financialmodelingprep.historical_price_eod.light.retrieve.v1.3f860211,4f389115-fc98-4ae4-9188-e0f445139c9a,True,1.15,2026-01-29,258.28,2026-01-30,259.48,0.465,2026-02-05,275.91,6.826

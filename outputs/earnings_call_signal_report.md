@@ -1,6 +1,6 @@
 # Earnings Call Signal Report: AAPL, NVDA
 
-Generated at `2026-05-19T10:41:21Z` with QVeris search + execute. Elapsed: `7.395s`.
+Generated at `2026-05-19T12:03:30Z` with QVeris search + execute. Elapsed: `11.706s`.
 
 ## Research Brief
 
@@ -15,6 +15,10 @@ Generated at `2026-05-19T10:41:21Z` with QVeris search + execute. Elapsed: `7.39
   - Margin 相关风险语境较多，建议检查这些表述是否来自管理层，还是分析师追问。
   - Guidance 相关风险语境较多，建议检查这些表述是否来自管理层，还是分析师追问。
   - Pricing 相关风险语境较多，建议检查这些表述是否来自管理层，还是分析师追问。
+  - NVDA 在 2026-02-25 电话会后的下一交易日涨跌为 -5.456%，建议把价格反应与逐字稿主题变化并读。
+  - AAPL 在 2026-04-30 电话会后的下一交易日涨跌为 3.239%，建议把价格反应与逐字稿主题变化并读。
+  - NVDA 在 2025-11-19 电话会后的下一交易日涨跌为 -3.152%，建议把价格反应与逐字稿主题变化并读。
+  - NVDA 最近财年毛利率 71.068%、经营利润率 60.382%，建议与 Margin / Pricing 主题一起复核。
 
 ## QVeris Tool Discovery
 
@@ -51,6 +55,27 @@ Generated at `2026-05-19T10:41:21Z` with QVeris search + execute. Elapsed: `7.39
 | AAPL | SupplyChain | FY2026 Q2 | FY2026 Q1 | 1.23 | 1.193 | 0.037 |
 | NVDA | Pricing | FY2026 Q4 | FY2026 Q3 | 0.452 | 0.449 | 0.003 |
 
+## Theme Timeseries
+
+| Symbol | Period | Theme | Mentions / 1k words | Opportunity | Risk | Top semantic bucket |
+|---|---|---|---:|---:|---:|---|
+| NVDA | FY2026 Q4 | SupplyChain | 1.468 | 10 | 0 | supply |
+| NVDA | FY2026 Q3 | SupplyChain | 2.47 | 7 | 0 | supply |
+| NVDA | FY2026 Q4 | Pricing | 0.452 | 2 | 0 | pricing |
+| NVDA | FY2026 Q3 | Pricing | 0.449 | 2 | 0 | pricing |
+| NVDA | FY2026 Q4 | Margin | 0.226 | 0 | 0 | product_technology |
+| NVDA | FY2026 Q3 | Margin | 0.112 | 0 | 0 | margin_cost |
+| NVDA | FY2026 Q4 | Guidance | 0.565 | 4 | 0 | supply |
+| NVDA | FY2026 Q3 | Guidance | 0.674 | 6 | 0 | supply |
+| NVDA | FY2026 Q4 | Competition | 0.0 | 0 | 0 | general |
+| NVDA | FY2026 Q3 | Competition | 0.225 | 0 | 0 | demand |
+| NVDA | FY2026 Q4 | AI | 8.811 | 43 | 0 | product_technology |
+| NVDA | FY2026 Q3 | AI | 10.555 | 40 | 0 | product_technology |
+| AAPL | FY2026 Q2 | SupplyChain | 1.23 | 3 | 0 | supply |
+| AAPL | FY2026 Q1 | SupplyChain | 1.193 | 6 | 1 | demand |
+| AAPL | FY2026 Q2 | Pricing | 0.783 | 1 | 1 | pricing |
+| AAPL | FY2026 Q1 | Pricing | 2.266 | 7 | 2 | pricing |
+
 ## Period Summaries
 
 | Symbol | Period | Date | Words | Speakers | AI | Margin | Guidance | SupplyChain | Pricing | Competition |
@@ -68,6 +93,38 @@ Generated at `2026-05-19T10:41:21Z` with QVeris search + execute. Elapsed: `7.39
 | NVDA | 2025-11-19 | ok | 186.52 | 180.64 | -3.152% | -3.356% |
 | AAPL | 2026-04-30 | ok | 271.35 | 280.14 | 3.239% | 5.93% |
 | AAPL | 2026-01-29 | ok | 258.28 | 259.48 | 0.465% | 6.826% |
+
+## Fundamentals Context
+
+| Symbol | Fiscal year | Revenue | Gross margin | Operating margin | ROIC | Capex / revenue |
+|---|---:|---:|---:|---:|---:|---:|
+| AAPL | 2025 | 416161000000.0 | 46.905% | 31.971% | 51.97% | 3.06% |
+| AAPL | 2024 | 391035000000.0 | 46.206% | 31.51% | 44.31% | 2.42% |
+| AAPL | 2023 | 383285000000.0 | 44.131% | 29.821% | 43.39% | 2.86% |
+| NVDA | 2026 | 215938000000.0 | 71.068% | 60.382% | 62.88% | 2.8% |
+| NVDA | 2025 | 130497000000.0 | 74.989% | 62.418% | 75.28% | 2.48% |
+| NVDA | 2024 | 60922000000.0 | 72.718% | 54.122% | 51.29% | 1.75% |
+
+## News Context
+
+### AAPL
+- [MarketReaction,Competition] 2026-05-19 06:10:00 · The Motley Fool: Best Warren Buffett Stock to Buy Right Now: Apple vs Coca-Cola
+- [AI] 2026-05-18 18:56:50 · CNET: Apple's Next-Gen Siri App May Lean Heavily on Google's AI
+- [AI,Product] 2026-05-18 18:56:37 · CNET: Apple Reveals Dates of Tim Cook's Final WWDC as CEO
+
+### NVDA
+- [General] 2026-05-19 07:14:13 · Business Insider: Jensen Huang says he wouldn't start Nvidia again if he knew the pain ahead
+- [MarketReaction,Financials] 2026-05-19 06:23:00 · Barrons: Nvidia Stock Set for 3-Day Losing Streak. Why That Could Be a Positive.
+- [General] 2026-05-19 06:21:00 · WSJ: Big Tech Is Cutting Back on Buybacks. Nvidia Could Be the Exception.
+
+## Research Timeline
+
+| Symbol | Period | Strongest theme | Mentions | Next return | Latest gross margin | Latest operating margin |
+|---|---|---|---:|---:|---:|---:|
+| NVDA | FY2026 Q4 | AI | 78 | -5.456% | 71.068% | 60.382% |
+| NVDA | FY2026 Q3 | AI | 94 | -3.152% | 71.068% | 60.382% |
+| AAPL | FY2026 Q2 | Margin | 20 | 3.239% | 46.905% | 31.971% |
+| AAPL | FY2026 Q1 | AI | 21 | 0.465% | 46.905% | 31.971% |
 
 ## LLM Review Pack
 

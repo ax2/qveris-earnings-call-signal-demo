@@ -29,6 +29,9 @@ def run(
     theme_set: str = typer.Option("extended", help="Theme preset: core or extended."),
     themes: str | None = typer.Option(None, help="Optional theme subset, e.g. AI,Margin,Guidance."),
     market_context: bool = typer.Option(False, help="Fetch post-call price context through QVeris."),
+    fundamentals_context: bool = typer.Option(False, help="Fetch financial metrics and income-statement context through QVeris."),
+    news_context: bool = typer.Option(False, help="Fetch latest stock-news context through QVeris."),
+    full_context: bool = typer.Option(False, help="Enable market, fundamentals, and news context together."),
     output_dir: Path = typer.Option(Path("outputs"), help="Directory for JSON, Markdown, and CSV outputs."),
     markdown: bool = typer.Option(False, help="Print Markdown instead of JSON summary."),
     write_files: bool = typer.Option(True, help="Write report files to output_dir."),
@@ -38,7 +41,9 @@ def run(
             symbols=_parse_symbols(symbols),
             quarters_per_symbol=quarters,
             themes=_theme_subset(themes, theme_set),
-            include_market_context=market_context,
+            include_market_context=market_context or full_context,
+            include_fundamentals_context=fundamentals_context or full_context,
+            include_news_context=news_context or full_context,
         )
     )
     paths: dict[str, str] = {}

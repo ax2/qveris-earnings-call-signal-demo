@@ -252,7 +252,7 @@
       "fifth_trading_date": "2026-03-04",
       "fifth_close": 183.04,
       "fifth_return_pct": -6.402,
-      "execution_id": "576edda5-3b19-42f8-8ce3-43b9c15133b4",
+      "execution_id": "f7975538-5c80-435c-8fd5-e8bff419392e",
       "success": true,
       "cost": 1.15
     },
@@ -271,7 +271,7 @@
       "fifth_trading_date": "2025-11-26",
       "fifth_close": 180.26,
       "fifth_return_pct": -3.356,
-      "execution_id": "576edda5-3b19-42f8-8ce3-43b9c15133b4",
+      "execution_id": "f7975538-5c80-435c-8fd5-e8bff419392e",
       "success": true,
       "cost": 1.15
     },
@@ -290,7 +290,7 @@
       "fifth_trading_date": "2026-05-07",
       "fifth_close": 287.44,
       "fifth_return_pct": 5.93,
-      "execution_id": "d39a5742-f457-463d-b6f3-878230e009d8",
+      "execution_id": "4f389115-fc98-4ae4-9188-e0f445139c9a",
       "success": true,
       "cost": 1.15
     },
@@ -309,11 +309,211 @@
       "fifth_trading_date": "2026-02-05",
       "fifth_close": 275.91,
       "fifth_return_pct": 6.826,
-      "execution_id": "d39a5742-f457-463d-b6f3-878230e009d8",
+      "execution_id": "4f389115-fc98-4ae4-9188-e0f445139c9a",
       "success": true,
       "cost": 1.15
     }
   ],
+  "fundamentals_context": [
+    {
+      "symbol": "AAPL",
+      "fiscal_year": "2025",
+      "period": "FY",
+      "date": "2025-09-27",
+      "status": "ok",
+      "revenue": 416161000000.0,
+      "gross_margin_pct": 46.905,
+      "operating_margin_pct": 31.971,
+      "net_margin_pct": 26.915,
+      "return_on_invested_capital_pct": 51.97,
+      "capex_to_revenue_pct": 3.06,
+      "free_cash_flow_yield_pct": 2.59,
+      "market_cap": 3818743810000.0,
+      "metrics_execution_id": "367039bd-73d1-4625-a345-e5fae3e1e74a",
+      "income_execution_id": "3068eb9b-3fd7-4824-8a17-88e88504a6fa",
+      "metrics_cost": 1.15,
+      "income_cost": 1.15
+    },
+    {
+      "symbol": "AAPL",
+      "fiscal_year": "2024",
+      "period": "FY",
+      "date": "2024-09-28",
+      "status": "ok",
+      "revenue": 391035000000.0,
+      "gross_margin_pct": 46.206,
+      "operating_margin_pct": 31.51,
+      "net_margin_pct": 23.971,
+      "return_on_invested_capital_pct": 44.31,
+      "capex_to_revenue_pct": 2.42,
+      "free_cash_flow_yield_pct": 3.11,
+      "market_cap": 3495160329570.0,
+      "metrics_execution_id": "367039bd-73d1-4625-a345-e5fae3e1e74a",
+      "income_execution_id": "3068eb9b-3fd7-4824-8a17-88e88504a6fa",
+      "metrics_cost": 1.15,
+      "income_cost": 1.15
+    },
+    {
+      "symbol": "AAPL",
+      "fiscal_year": "2023",
+      "period": "FY",
+      "date": "2023-09-30",
+      "status": "ok",
+      "revenue": 383285000000.0,
+      "gross_margin_pct": 44.131,
+      "operating_margin_pct": 29.821,
+      "net_margin_pct": 25.306,
+      "return_on_invested_capital_pct": 43.39,
+      "capex_to_revenue_pct": 2.86,
+      "free_cash_flow_yield_pct": 3.69,
+      "market_cap": 2695569789510.0,
+      "metrics_execution_id": "367039bd-73d1-4625-a345-e5fae3e1e74a",
+      "income_execution_id": "3068eb9b-3fd7-4824-8a17-88e88504a6fa",
+      "metrics_cost": 1.15,
+      "income_cost": 1.15
+    },
+    {
+      "symbol": "NVDA",
+      "fiscal_year": "2026",
+      "period": "FY",
+      "date": "2026-01-25",
+      "status": "ok",
+      "revenue": 215938000000.0,
+      "gross_margin_pct": 71.068,
+      "operating_margin_pct": 60.382,
+      "net_margin_pct": 55.603,
+      "return_on_invested_capital_pct": 62.88,
+      "capex_to_revenue_pct": 2.8,
+      "free_cash_flow_yield_pct": 2.13,
+      "market_cap": 4531966880000.0,
+      "metrics_execution_id": "41c04550-4fc3-4264-b189-159ff865f263",
+      "income_execution_id": "ada8c4de-fa36-47b5-9645-94a302fd4e97",
+      "metrics_cost": 1.15,
+      "income_cost": 1.15
+    },
+    {
+      "symbol": "NVDA",
+      "fiscal_year": "2025",
+      "period": "FY",
+      "date": "2025-01-26",
+      "status": "ok",
+      "revenue": 130497000000.0,
+      "gross_margin_pct": 74.989,
+      "operating_margin_pct": 62.418,
+      "net_margin_pct": 55.848,
+      "return_on_invested_capital_pct": 75.28,
+      "capex_to_revenue_pct": 2.48,
+      "free_cash_flow_yield_pct": 2.09,
+      "market_cap": 2907803100000.0,
+      "metrics_execution_id": "41c04550-4fc3-4264-b189-159ff865f263",
+      "income_execution_id": "ada8c4de-fa36-47b5-9645-94a302fd4e97",
+      "metrics_cost": 1.15,
+      "income_cost": 1.15
+    },
+    {
+      "symbol": "NVDA",
+      "fiscal_year": "2024",
+      "period": "FY",
+      "date": "2024-01-28",
+      "status": "ok",
+      "revenue": 60922000000.0,
+      "gross_margin_pct": 72.718,
+      "operating_margin_pct": 54.122,
+      "net_margin_pct": 48.849,
+      "return_on_invested_capital_pct": 51.29,
+      "capex_to_revenue_pct": 1.75,
+      "free_cash_flow_yield_pct": 1.75,
+      "market_cap": 1542384300000.0,
+      "metrics_execution_id": "41c04550-4fc3-4264-b189-159ff865f263",
+      "income_execution_id": "ada8c4de-fa36-47b5-9645-94a302fd4e97",
+      "metrics_cost": 1.15,
+      "income_cost": 1.15
+    }
+  ],
+  "news_summary": {
+    "topic_counts_by_symbol": {
+      "AAPL": {
+        "AI": 5,
+        "MarketReaction": 3,
+        "Product": 2,
+        "Competition": 1,
+        "General": 1
+      },
+      "NVDA": {
+        "Financials": 4,
+        "AI": 4,
+        "General": 2,
+        "MarketReaction": 2,
+        "Product": 2
+      }
+    },
+    "latest_titles_by_symbol": {
+      "AAPL": [
+        {
+          "published_at": "2026-05-19 06:10:00",
+          "publisher": "The Motley Fool",
+          "title": "Best Warren Buffett Stock to Buy Right Now: Apple vs Coca-Cola",
+          "topics": "MarketReaction,Competition"
+        },
+        {
+          "published_at": "2026-05-18 18:56:50",
+          "publisher": "CNET",
+          "title": "Apple's Next-Gen Siri App May Lean Heavily on Google's AI",
+          "topics": "AI"
+        },
+        {
+          "published_at": "2026-05-18 18:56:37",
+          "publisher": "CNET",
+          "title": "Apple Reveals Dates of Tim Cook's Final WWDC as CEO",
+          "topics": "AI,Product"
+        },
+        {
+          "published_at": "2026-05-18 18:40:00",
+          "publisher": "PRNewsWire",
+          "title": "Red Apple Group Selects FirstService Residential to Manage The Residences at 400 Central",
+          "topics": "General"
+        },
+        {
+          "published_at": "2026-05-18 18:35:57",
+          "publisher": "PYMNTS",
+          "title": "Apple to Bolster AI Capabilities in iOS 27",
+          "topics": "AI,Product"
+        }
+      ],
+      "NVDA": [
+        {
+          "published_at": "2026-05-19 07:14:13",
+          "publisher": "Business Insider",
+          "title": "Jensen Huang says he wouldn't start Nvidia again if he knew the pain ahead",
+          "topics": "General"
+        },
+        {
+          "published_at": "2026-05-19 06:23:00",
+          "publisher": "Barrons",
+          "title": "Nvidia Stock Set for 3-Day Losing Streak. Why That Could Be a Positive.",
+          "topics": "MarketReaction,Financials"
+        },
+        {
+          "published_at": "2026-05-19 06:21:00",
+          "publisher": "WSJ",
+          "title": "Big Tech Is Cutting Back on Buybacks. Nvidia Could Be the Exception.",
+          "topics": "General"
+        },
+        {
+          "published_at": "2026-05-19 06:17:33",
+          "publisher": "Invezz",
+          "title": "Blackstone bets $5 billion on Google's secret AI chip to rival Nvidia",
+          "topics": "AI,Product"
+        },
+        {
+          "published_at": "2026-05-19 06:05:53",
+          "publisher": "Reuters",
+          "title": "Nvidia's outlook will be a test of its strategy to maintain AI dominance",
+          "topics": "AI,Product,Financials"
+        }
+      ]
+    }
+  },
   "evidence": [
     {
       "symbol": "NVDA",
@@ -326,6 +526,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...dynamics. Each will contribute to infrastructure growth in the coming years. NVIDIA Corporation is chosen because our singular architecture enables all three transitions. And thus so for any form and modality of AI across all industries, across every phase of AI, across all of the diverse computing needs, in a cloud, and also from cloud to enterprise to robots. One architecture. Toshiya, back to you. Toshiya Hari: We will now open the call for questions. Operator, would you please poll for questions? Sarah: Thank you..."
     },
     {
@@ -339,6 +540,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...s. Most of the world's industries haven't really engaged AgenTic AI yet. And they're about to. You know? All the names of companies that that you know we're working with know, whether whether it's autonomous vehicle companies or digital twins for for physical AI for for factories and the number of factories and warehouses being built around the world. Just the number of digital biology startups that are being funded so that we could accelerate drug discovery. All of those different industries are now getting engaged,..."
     },
     {
@@ -352,6 +554,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...ringing Claude onto the NVIDIA Corporation platform. And so what what do we have now? NVIDIA Corporation's architecture, taking a step back, NVIDIA Corporation's architecture NVIDIA Corporation's platform, is the singular platform in the world that runs every AI model. We run OpenAI, We run Anthropic. We run XAI. Because of our deep partnership with Elon and x AI, we were able to bring that opportunity to Saudi Arabia to the KSA so that humane could also be hosting opportunity for x AI. We run x AI. We run we run Gem..."
     },
     {
@@ -365,6 +568,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...n's architecture, taking a step back, NVIDIA Corporation's architecture NVIDIA Corporation's platform, is the singular platform in the world that runs every AI model. We run OpenAI, We run Anthropic. We run XAI. Because of our deep partnership with Elon and x AI, we were able to bring that opportunity to Saudi Arabia to the KSA so that humane could also be hosting opportunity for x AI. We run x AI. We run we run Gemini. We run thinking machines. Let's see. What else do we run? We run them all. And so not to mention,..."
     },
     {
@@ -378,6 +582,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...rm in the world that runs every AI model. We run OpenAI, We run Anthropic. We run XAI. Because of our deep partnership with Elon and x AI, we were able to bring that opportunity to Saudi Arabia to the KSA so that humane could also be hosting opportunity for x AI. We run x AI. We run we run Gemini. We run thinking machines. Let's see. What else do we run? We run them all. And so not to mention, we run the science models, the biology models, DNA models, gene models, chemical models, and all the different fields around..."
     },
     {
@@ -391,6 +596,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...ld that runs every AI model. We run OpenAI, We run Anthropic. We run XAI. Because of our deep partnership with Elon and x AI, we were able to bring that opportunity to Saudi Arabia to the KSA so that humane could also be hosting opportunity for x AI. We run x AI. We run we run Gemini. We run thinking machines. Let's see. What else do we run? We run them all. And so not to mention, we run the science models, the biology models, DNA models, gene models, chemical models, and all the different fields around the world. It..."
     },
     {
@@ -404,6 +610,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...time, you haven't seen all the demand that there is. There's possibility of upside to those numbers as we move forward? Colette Kress: Yeah. Thanks, Joe. I'll start first with a response here on that. Yes. That's correct. We are working into our $500 billion forecast. And we are on track for that as we have finished some of the quarters. And now we have several quarters now in front of us to take us through the end of calendar year '26. The number will grow. And we will achieve, I'm sure, additional needs for compute that..."
     },
     {
@@ -417,6 +624,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "margin_cost",
       "snippet": "...old them in the mid-seventies. So I I guess, first of all, what are the biggest cost increases? Is is it just memory, or is it something else? What are you doing to work toward that? Is it how much is, like, you know, cost optimizations versus pre buys versus pricing And then also, how should we think about OpEx growth next year given the revenues seem likely to to grow materially? From from where we're running right now? Colette Kress: Stacy. Let me see if I can start with remembering where we were with the current fisca..."
     },
     {
@@ -430,6 +638,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...t that as the backdrop, do you see a realistic path for supply to catch up with demand over the next twelve to eighteen months, or or do you think it can extend beyond that time frame? Jensen Huang: Well, as you know, we've done a really good job planning our supply chain. NVIDIA Corporation's supply chain basically includes every technology company in the world. And TSMC and their packaging and our memory vendors and memory partners and all of our system ODMs have done a really good job planning with us. And we were planning..."
     },
     {
@@ -443,6 +652,7 @@
       "transcript_segment": "qa",
       "source_context": "analyst_prompted",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...a realistic path for supply to catch up with demand over the next twelve to eighteen months, or or do you think it can extend beyond that time frame? Jensen Huang: Well, as you know, we've done a really good job planning our supply chain. NVIDIA Corporation's supply chain basically includes every technology company in the world. And TSMC and their packaging and our memory vendors and memory partners and all of our system ODMs have done a really good job planning with us. And we were planning for a big year. You know, we've see..."
     },
     {
@@ -456,6 +666,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...AI, thanks to the unique combination of performance, efficiency and on-device capabilities. When you combine this level of integration with our relentless focus on the customer experience, it becomes clear why Apple platforms are the best place to experience AI. Now let's turn to services, which set an all-time revenue record with $31 billion. We saw double-digit growth in both developed and emerging markets and set new all-time revenue records across most of the services categories. There's no better place to find..."
     },
     {
@@ -469,6 +680,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...igh school students from Windows laptops and Chromebooks to MacBook Neo, completing their transition to an all- Apple district. And in India, leading enterprise software provider, Freshworks, deployed over 5,000 MacBook Pro and MacBook Air to accelerate their AI development. Let's turn to our cash position and capital return program. We ended the quarter with $147 billion in cash and marketable securities. We had $5.8 billion of debt maturities and commercial paper remained unchanged at $2 billion, resulting in $85 b..."
     },
     {
@@ -482,6 +694,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...at we're seeing. And we have less flexibility in the supply chain than we normally would. For Mac, in the June quarter, there's 2 factors that are driving the constraints. One is that on the Mac Mini and the Mac Studio, both of these are amazing platforms for AI and Agentic tools. And the customer recognition of that is happening faster than what we had predicted. And so we saw higher-than-expected demand. The second reason is that the customer response to Mac Neo has just been off the charts, with higher-than-expect..."
     },
     {
@@ -495,6 +708,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "margin_cost",
       "snippet": "...next question, please? Operator: Our next question is from Erik Woodring of Morgan Stanley. Erik Woodring: Tim, congrats on announcing the partnership with Google, and we're all excited to see what you bring to market later this year. When I think about your AI initiatives, it's clear there are added costs associated with that. We're obviously seeing that flow through in OpEx. Can you help us understand maybe what the revenue upside potential that exists with AI? Many of your competitors have already integrated AI i..."
     },
     {
@@ -508,6 +722,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...ing to market later this year. When I think about your AI initiatives, it's clear there are added costs associated with that. We're obviously seeing that flow through in OpEx. Can you help us understand maybe what the revenue upside potential that exists with AI? Many of your competitors have already integrated AI into their devices. And it's just not clear yet what incremental monetization they're seeing because of AI, but you're always disciplined with investing. You obviously have a differentiated product. So how..."
     },
     {
@@ -521,6 +736,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...r AI initiatives, it's clear there are added costs associated with that. We're obviously seeing that flow through in OpEx. Can you help us understand maybe what the revenue upside potential that exists with AI? Many of your competitors have already integrated AI into their devices. And it's just not clear yet what incremental monetization they're seeing because of AI, but you're always disciplined with investing. You obviously have a differentiated product. So how do you monetize AI? And what's the time line to reali..."
     },
     {
@@ -534,6 +750,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...hrough in OpEx. Can you help us understand maybe what the revenue upside potential that exists with AI? Many of your competitors have already integrated AI into their devices. And it's just not clear yet what incremental monetization they're seeing because of AI, but you're always disciplined with investing. You obviously have a differentiated product. So how do you monetize AI? And what's the time line to realizing that ROI? Then a quick follow-up. Timothy Cook: Well, let me just say that we're bringing intelligence..."
     },
     {
@@ -547,6 +764,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "competition",
       "snippet": ".... Operator, could we get the next question, please? Operator: The next question will be coming from Ben Reitzes of Melius. Benjamin Reitzes: First question is on Google partnership again. I wanted to understand how you came to that decision with regard to the AI and Siri in particular? And if there's an opportunity for you guys to share in revenue too with that partnership like you do in search? Timothy Cook: Yes. We basically determined that Google's AI technology would provide the most capable foundation for AFM --..."
     },
     {
@@ -560,6 +778,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "competition",
       "snippet": "...to understand how you came to that decision with regard to the AI and Siri in particular? And if there's an opportunity for you guys to share in revenue too with that partnership like you do in search? Timothy Cook: Yes. We basically determined that Google's AI technology would provide the most capable foundation for AFM -- I'm sorry, Apple Foundation Models. And we believe that we can unlock a lot of experiences and innovate in a key way due to the collaboration. We'll continue to run on the device and run in priva..."
     },
     {
@@ -573,6 +792,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...the very first time. We've been enormously pleased with how the entire lineup has been received. In fact, the iPhone 17 family is now the most popular lineup in our history when looking at the launch through the March quarter. And according to IDC, we gained market share during the quarter. Mac revenue was $8.4 billion for the March quarter, up 6% from a year ago despite supply constraints driven by higher-than-expected levels of demand. We're delighted with the reception of what is the most advanced Mac lineup in our history..."
     },
     {
@@ -586,6 +806,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...supply constraints driven by higher-than-expected levels of demand. We're delighted with the reception of what is the most advanced Mac lineup in our history. We set March quarter records for upgraders and customers new to Mac. And according to IDC, we gained market share in the quarter. From Mac Mini to MacBook Pro and everything in between, Mac is the best platform for AI with Apple Silicon delivering exceptional performance, industry-leading efficiency and the ability to run advanced models locally in ways that simply weren..."
     },
     {
@@ -599,6 +820,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "risk",
+      "semantic_bucket": "competition",
       "snippet": "...m. Just a lot of discussion on memory pricing. Given that the memory constraint or commodity scarcity is impacting both the smartphone and the PC markets, and Apple, arguably having more purchasing power. Do you think this is a chance for you to increase your market share, both in iPhone and Mac at the expense of competition who might have more constraints in getting access to memory? Timothy Cook: Yes. I don't want to talk about kind of what has happened. And we do believe, as I had shared that iPhone gained share in the Dece..."
     },
     {
@@ -612,6 +834,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "risk",
+      "semantic_bucket": "competition",
       "snippet": "...at the memory constraint or commodity scarcity is impacting both the smartphone and the PC markets, and Apple, arguably having more purchasing power. Do you think this is a chance for you to increase your market share, both in iPhone and Mac at the expense of competition who might have more constraints in getting access to memory? Timothy Cook: Yes. I don't want to talk about kind of what has happened. And we do believe, as I had shared that iPhone gained share in the December quarter. And if you look at Mac for the full year..."
     },
     {
@@ -625,6 +848,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "risk",
+      "semantic_bucket": "margin_cost",
       "snippet": "...those regarding revenue, gross margin, operating expenses, other income and expense, taxes, capital allocation and future business outlook. These statements involve risks and uncertainties that may cause actual results or trends to differ materially from our forecast, including risks related to the potential impact to the company's business and results of operations from macroeconomic conditions, tariffs and other measures and legal and regulatory proceedings. For more information, please refer to the risk factors discuss..."
     },
     {
@@ -638,6 +862,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...head. And with that, let me turn it back over to Tim. Timothy Cook: Thanks, John. Now let me turn to the quarter. Today, Apple is proud to report $111.2 billion in revenue, up 17% from a year ago and a March quarter record, which was above the high end of our guidance range despite supply constraints. Customer enthusiasm for iPhone has been extraordinary with revenue growing 22% year-over-year to achieve a March quarter record. Services reached an all-time revenue record, growing 16% from a year ago, while EPS set a March..."
     },
     {
@@ -651,6 +876,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "margin_cost",
       "snippet": "...ories and geographic segments. Services revenue was $31 billion, up 16% year-over-year. We saw strong performance across the board with double-digit growth in the vast majority of the markets we track. Company gross margin was 49.3%, above the high end of our guidance range and up 110 basis points sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9 billion, up 24% year-over-year. This was slig..."
     },
     {
@@ -664,6 +890,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "margin_cost",
       "snippet": "...sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9 billion, up 24% year-over-year. This was slightly above the high end of our guidance range due to a one-time expense in SG&A. Net income was $29.6 billion and diluted earnings per share was $2.01, up 22% year-over-year. Both net income and diluted EPS achieved March quarter records and drove a very strong level of operating cash flow at $28.7..."
     },
     {
@@ -677,6 +904,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "risk",
+      "semantic_bucket": "supply",
       "snippet": "...r outlook, which includes the types of forward-looking information that Suhasini referred to. Importantly, the color we're providing assumes that global tariff rates, policies and their application remain in effect as of this call and the global macroeconomic outlook does not worsen from today. We expect our June quarter total company revenue to grow by 14% to 17% year-over-year, which comprehends our best view of constraint supply. On iPad, keep in mind, we face a difficult compare driven by the launch of A16-powered iPa..."
     },
     {
@@ -690,6 +918,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...you, Kevan. [Operator Instructions] Operator, may we have the first question, please? Operator: Certainly. We'll go ahead and take our first question from Erik Woodring with Morgan Stanley. Erik Woodring: And Tim, I'll save the congrats on the Art of war for next quarter, but it's been a pleasure working together. I would love, maybe, Tim, if I could ask you just to maybe contextualize the supply constraints you alluded to in your prepared remarks, meaning how much did demand outpace supply for iPhone and Mac in the March qua..."
     },
     {
@@ -703,6 +932,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "demand",
       "snippet": "...g together. I would love, maybe, Tim, if I could ask you just to maybe contextualize the supply constraints you alluded to in your prepared remarks, meaning how much did demand outpace supply for iPhone and Mac in the March quarter? And does your June quarter guidance also reflect supply constraints for those segments? Or is that kind of an unconstrained guide as you see it today? And then a quick follow-up, please. Timothy Cook: Yes. Erik, thanks for your comments. We were constrained during the March quarter. This was pr..."
     },
     {
@@ -716,6 +946,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "risk",
+      "semantic_bucket": "margin_cost",
       "snippet": "...those regarding revenue, gross margin, operating expenses, other income and expense, taxes, capital allocation and future business outlook. These statements involve risks and uncertainties that may cause actual results or trends to differ materially from our forecast including risks related to the potential impact to the company's business and results of operations from macroeconomic conditions, tariffs and other measures and legal and regulatory proceedings. For more information, please refer to the risk factors discusse..."
     },
     {
@@ -729,6 +960,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "pricing",
       "snippet": "...growth in almost every market we track. We also reached all-time revenue records for advertising, cloud services, music and payment services with December quarter records on the App Store and video. Company gross margin was at 48.2%, above the high end of our guidance range and up 100 basis points sequentially, driven by favorable mix and leverage. Products gross margin was 40.7%, up 450 basis points sequentially driven by favorable mix and leverage. Services gross margin was 76.5%, up 120 basis points sequentially, driven..."
     },
     {
@@ -742,6 +974,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "risk",
+      "semantic_bucket": "regulation_macro",
       "snippet": "...ng the quarter, we returned nearly $32 billion to shareholders. This included $3.9 billion in dividends and equivalents and $25 billion through open market repurchases of 93 million Apple shares. As we move ahead into the March quarter, I'd like to review our outlook which includes the types of forward-looking information that Suhasini referred to. Importantly, the color we're providing assumes that global tariff rates, policies and their application remain in effect as of this call, and the global macroeconomic outlook d..."
     },
     {
@@ -755,6 +988,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "risk",
+      "semantic_bucket": "supply",
       "snippet": "...r outlook which includes the types of forward-looking information that Suhasini referred to. Importantly, the color we're providing assumes that global tariff rates, policies and their application remain in effect as of this call, and the global macroeconomic outlook does not worsen from today. We expect our March quarter total company revenue to grow by 13% to 16% year-over-year, which comprehends our best estimates of constrained iPhone supply during the quarter. We expect services revenue to grow at a year-over-year ra..."
     },
     {
@@ -768,6 +1002,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "product_technology",
       "snippet": "...ni Chandramouli: Awesome. Thank you, Erik. Operator, could we get the next question, please? Operator: We'll now go to Michael Ng of Goldman Sachs. Michael Ng: Wonderful. I have 2 as well, if I could. First, it was encouraging to hear about the revenue growth outlook of 13% to 16% for the March quarter. I was just wondering if you could talk about any comps that we should be particularly aware of as we kind of think about each of the product categories? I know last year, you guys had MacBook Air with M4, the iPhone 16E, t..."
     },
     {
@@ -781,6 +1016,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "general",
       "snippet": "...Thanks for the question. Yes, I wouldn't say there's any particular comp issue that we'd note. As you recall, last quarter, we talked about the difficult comparison we had on Mac. But there's nothing that rises to that kind of color that we'd outlined in the outlook. And so I think it's just a continuation of the strong cycle. We're seeing subject to the constraints that I had mentioned in the prepared remarks, and that Tim alluded to a little earlier as well. Michael Ng: Great. Wonderful. And then just on services, adve..."
     },
     {
@@ -794,6 +1030,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "pricing",
       "snippet": "...of highlighted mix as a driver, can you just sort of talk through what are the big differences in mix you're seeing for iPhone 17 versus 16? And did tariffs and tariffs coming in more favorable play a role at all and what you're expecting for tariffs for the next quarter? Kevan Parekh: Yes. So there's a few things to unpack there. So on the overall margin on product side, I think I mentioned that we had favorable mix of products and leverage. I think given the strong iPhone cycle we're seeing, that was, I would say, probably..."
     },
     {
@@ -807,6 +1044,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "margin_cost",
       "snippet": "...other all-time high across all major product categories and geographic segments. Services revenue was $31 billion, up 16% year-over-year. We saw strong performance across the board with double-digit growth in the vast majority of the markets we track. Company gross margin was 49.3%, above the high end of our guidance range and up 110 basis points sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9..."
     },
     {
@@ -820,6 +1058,7 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "margin_cost",
       "snippet": "...n, up 16% year-over-year. We saw strong performance across the board with double-digit growth in the vast majority of the markets we track. Company gross margin was 49.3%, above the high end of our guidance range and up 110 basis points sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9 billion, up 24% year-over-year. This was slightly above the high end of our guidance range due to a one-time ex..."
     },
     {
@@ -833,8 +1072,9 @@
       "transcript_segment": "prepared_remarks",
       "source_context": "management_active",
       "label": "opportunity",
+      "semantic_bucket": "margin_cost",
       "snippet": "...with double-digit growth in the vast majority of the markets we track. Company gross margin was 49.3%, above the high end of our guidance range and up 110 basis points sequentially. Products gross margin was 38.7%, down 200 basis points sequentially. Services gross margin was 76.7%, up 20 basis points sequentially. Operating expenses landed at $18.9 billion, up 24% year-over-year. This was slightly above the high end of our guidance range due to a one-time expense in SG&A. Net income was $29.6 billion and diluted earnings per..."
     }
   ],
-  "prompt": "Based on the portfolio_view, market_context, and evidence rows, draft a concise earnings-call review memo. Group observations by theme, flag whether each point came from prepared remarks, analyst questions, or management responses, and list follow-up questions for human review."
+  "prompt": "Based on the portfolio_view, market_context, fundamentals_context, news_summary, and evidence rows, draft a concise earnings-call review memo. Group observations by theme, flag whether each point came from prepared remarks, analyst questions, or management responses, and list follow-up questions for human review."
 }
