@@ -61,6 +61,7 @@ def _dashboard_html(report: dict[str, Any]) -> str:
     portfolio = report.get("portfolio_view") or {}
     totals = portfolio.get("theme_totals") or {}
     analyses = report.get("analyses") or []
+    report_themes = list((report.get("themes") or {}).keys())
     evidence_rows = sum(
         int((theme_payload or {}).get("mentions") or 0)
         for analysis in analyses
@@ -174,9 +175,17 @@ def _dashboard_html(report: dict[str, Any]) -> str:
           a {{ color: inherit; }}
           .actions {{ display: flex; gap: 10px; flex-wrap: wrap; }}
           .button {{ border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 10px 13px; text-decoration: none; font-size: 14px; color: var(--ink); }}
+          .button.primary {{ background: var(--blue); border-color: var(--blue); color: #fff; cursor: pointer; }}
+          .button:disabled {{ cursor: wait; opacity: 0.7; }}
           .grid {{ display: grid; gap: 18px; }}
           .metrics {{ grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 26px 0 18px; }}
           .two {{ grid-template-columns: 1fr 1fr; }}
+          .run-form {{ grid-template-columns: 1.2fr 0.45fr 1.5fr auto; align-items: end; }}
+          label {{ display: grid; gap: 7px; color: var(--muted); font-size: 13px; }}
+          input {{ width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: inherit; color: var(--ink); background: #fff; }}
+          .checkbox {{ display: flex; align-items: center; gap: 8px; color: #273449; }}
+          .checkbox input {{ width: 16px; height: 16px; }}
+          .run-status {{ margin-top: 12px; min-height: 22px; color: var(--muted); font-size: 14px; }}
           .panel {{ background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03); }}
           .metric span {{ color: var(--muted); font-size: 14px; }}
           .metric strong {{ display: block; font-size: 30px; margin-top: 8px; }}
@@ -213,7 +222,7 @@ def _dashboard_html(report: dict[str, Any]) -> str:
           <header>
             <div>
               <h1>QVeris Earnings Call Signal Demo</h1>
-              <p>{_esc(brief.get("headline"))} Generated at <code>{_esc(report.get("generated_at"))}</code>.</p>
+              <p>{_esc(brief.get("headline"))} Cached report generated at <code>{_esc(report.get("generated_at"))}</code>.</p>
             </div>
             <nav class="actions">
               <a class="button" href="/screenshots">Screenshots</a>
@@ -228,6 +237,27 @@ def _dashboard_html(report: dict[str, Any]) -> str:
             <div class="panel metric"><span>Evidence rows</span><strong style="color:var(--teal)">{evidence_rows}</strong></div>
             <div class="panel metric"><span>Output files</span><strong style="color:var(--amber)">{output_count}</strong></div>
             <div class="panel metric"><span>Elapsed</span><strong style="color:var(--violet)">{_esc(report.get("elapsed_s"))}s</strong></div>
+          </section>
+
+          <section class="panel section">
+            <h2>Run Live QVeris Analysis</h2>
+            <form id="run-form" class="grid run-form">
+              <label>Symbols
+                <input id="symbols" value="{_esc(','.join(report.get("symbols") or ["AAPL", "NVDA"]))}" />
+              </label>
+              <label>Quarters
+                <input id="quarters" type="number" min="1" max="8" value="{_esc(report.get("quarters_per_symbol") or 2)}" />
+              </label>
+              <label>Themes
+                <input id="themes" value="{_esc(','.join(report_themes or ["AI", "Margin", "Guidance", "SupplyChain", "Pricing", "Competition"]))}" />
+              </label>
+              <button id="run-button" class="button primary" type="submit">Run live</button>
+            </form>
+            <label class="checkbox">
+              <input id="full-context" type="checkbox" checked />
+              Fetch market, fundamentals, and news context through QVeris
+            </label>
+            <p id="run-status" class="run-status">This button calls <code>POST /run</code>, writes fresh files under <code>outputs/</code>, then reloads this dashboard.</p>
           </section>
 
           <section class="grid two">
@@ -267,6 +297,45 @@ def _dashboard_html(report: dict[str, Any]) -> str:
             <div class="grid screenshots">{screenshot_cards}</div>
           </section>
         </main>
+        <script>
+          const form = document.getElementById("run-form");
+          const button = document.getElementById("run-button");
+          const status = document.getElementById("run-status");
+          form.addEventListener("submit", async (event) => {{
+            event.preventDefault();
+            const payload = {{
+              symbols: document.getElementById("symbols").value.split(",").map((item) => item.trim()).filter(Boolean),
+              quarters: Number(document.getElementById("quarters").value || 2),
+              theme_set: "extended",
+              themes: document.getElementById("themes").value.split(",").map((item) => item.trim()).filter(Boolean),
+              full_context: document.getElementById("full-context").checked,
+              write_files: true
+            }};
+            button.disabled = true;
+            button.textContent = "Running...";
+            status.textContent = "Calling QVeris search and execute APIs. This usually takes several seconds, and may consume API credits.";
+            try {{
+              const started = performance.now();
+              const response = await fetch("/run", {{
+                method: "POST",
+                headers: {{"Content-Type": "application/json"}},
+                body: JSON.stringify(payload)
+              }});
+              if (!response.ok) {{
+                const message = await response.text();
+                throw new Error(message || `HTTP ${{response.status}}`);
+              }}
+              const report = await response.json();
+              const elapsed = ((performance.now() - started) / 1000).toFixed(1);
+              status.textContent = `Finished live QVeris run in ${{elapsed}}s. Report generated at ${{report.generated_at}}. Reloading...`;
+              setTimeout(() => window.location.reload(), 900);
+            }} catch (error) {{
+              status.textContent = `Run failed: ${{error.message}}`;
+              button.disabled = false;
+              button.textContent = "Run live";
+            }}
+          }});
+        </script>
       </body>
     </html>
     """

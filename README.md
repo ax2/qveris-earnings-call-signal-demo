@@ -71,6 +71,7 @@ curl --noproxy '*' -s http://127.0.0.1:8092/run \
 Browser pages:
 
 - `GET /` shows the latest dashboard from `outputs/earnings_call_signal_report.json`.
+- The dashboard includes a "Run live" form that calls `POST /run`, writes fresh output files, and reloads the page.
 - `GET /report` shows the latest report as an HTML page.
 - `GET /report/markdown` shows the latest Markdown report.
 - `GET /screenshots` shows the generated article screenshot gallery.
